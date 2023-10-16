@@ -2,7 +2,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -23,6 +23,6 @@ jobs:
       - name: Docker build and publish
         run: |
           echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-          docker build -t spring-cicd . 
+          docker build -t spring-cicd .
           docker tag spring-cicd ararp1006@gmail.com/spring-cicd:${{ github.sha }}
           docker push ararp1006@gmail.com/spring-cicd:${{ github.sha }}
