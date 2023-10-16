@@ -50,10 +50,10 @@ public class SecurityConfig {
     private final UserDetailService userDetailService;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String clientId
+    private String clientId;
 
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-    private String clientSecret
+    private String clientSecret;
 
     public SecurityConfig(JwtTokenizer jwtTokenizer,MemberAuthority memberAuthority, RefreshTokenRepository refreshTokenRepository, MemberRepository memberRepository, MemberService memberService, UserDetailService userDetailService) {
         this.jwtTokenizer = jwtTokenizer;
