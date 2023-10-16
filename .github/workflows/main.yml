@@ -20,14 +20,9 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Docker build and push
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          IMAGE_TAG: ${{ github.sha }}
-          DOCKER_REPO: mainproject
+      - name: Docker build
         run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker build -t spring-cicd .
-          docker tag spring-cicd $DOCKER_REPO/spring-cicd:$IMAGE_TAG
-          docker push $DOCKER_REPO/spring-cicd:$IMAGE_TAG
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+          docker build -t spring-cicd . 
+          docker tag spring-cicd {ararp1006@gmail.com}/spring-cicd:${GITHUB_SHA::7}
+          docker push {ararp1006@gmail.com}/spring-cicd:${GITHUB_SHA::7}
