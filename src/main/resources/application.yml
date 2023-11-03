@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    active: test
+
+
+# test 프로파일 설정
+test:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -17,9 +23,6 @@ spring:
           init:
             schema-locations: classpath*:db/schema.sql #h2 테이블 위치
             data-locations: classpath*:db/data.sql  #h2 초기 데이터를 넣게 위한 스크립트 위치
-
-
-
       jpa:
         hibernate:
           ddl-auto: update    #스키마 직접 생성 (자동생성 X)
@@ -34,28 +37,13 @@ spring:
           schema-locations: classpath*:db/schema.sql #h2 테이블 위치
           data-locations: classpath*:db/data.sql  #h2 초기 데이터를 넣게 위한 스크립트 위치
 
-
-logging:
-  level:
-    com:
-      amazonaws:
-        util:
-          EC2MetadataUtils: error
-server:
-  servlet:
-    encoding:
-      force-response: true
-h2:
-  console:
-    enabled: false
-
 jwt:
-  access-token-expiration-minutes: 60
-  refresh-token-expiration-minutes: 120
-cloud:
-  aws:
-    credentials.access-key: ${S3_ACCESS_KEY}
-    credentials.secret-key: ${S3_SECRET_KEY}
-    s3.bucket: 28be
-    region.static: ap-northeast-2
-    stack.auto: false
+  secret-key: yourSecretKey123r345swergsdfg
+  access-token-expiration-minutes: 40
+  refresh-token-expiration-minutes: 420
+
+
+mail:
+  address:
+    admin: admin@gmail.com
+

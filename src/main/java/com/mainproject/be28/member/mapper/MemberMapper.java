@@ -1,49 +1,26 @@
 package com.mainproject.be28.member.mapper;
 
-import com.mainproject.be28.complain.dto.ComplainResponsesDto;
-import com.mainproject.be28.complain.entity.Complain;
-import com.mainproject.be28.member.dto.MemberPatchDto;
-import com.mainproject.be28.member.dto.MemberPostDto;
-import com.mainproject.be28.member.dto.MemberResponseDto;
+import com.mainproject.be28.member.dto.AuthLoginDto;
+import com.mainproject.be28.member.dto.MemberDto;
 import com.mainproject.be28.member.entity.Member;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "Spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MemberMapper {
 
-    default Member memberPostToMember(MemberPostDto memberPostDto){
-        Member member = new Member();
-        member.setMemberId(memberPostDto.getMemberId());
-        member.setPassword(memberPostDto.getPassword());
-        member.setEmail(memberPostDto.getEmail());
-        member.setName(memberPostDto.getName());
-        member.setPhone(memberPostDto.getPhone());
-        member.setAddress(memberPostDto.getAddress());
+    Member postToMember(MemberDto.PostDto postDto);
 
-        return member;
-    }
 
-    default Member memberPatchToMember(MemberPatchDto memberPatchDto){
-            if ( memberPatchDto == null ) {
-                return null;
-            }
-            Member member = new Member();
-            member.setPhone( memberPatchDto.getPhone() );
-            member.setAddress( memberPatchDto.getAddress() );
+    Member patchToMember(MemberDto.PatchDto patchDto);
 
-            return member;
-        }
+    MemberDto.ResponseDto memberToResponse(Member member);
 
-    default MemberResponseDto memberToMemberResponse(Member member){
-        MemberResponseDto response = new MemberResponseDto(
-                member.getEmail(),
-                member.getName(),
-                member.getPhone(),
-                member.getAddress()
-        );
-        return response;
-    }
+    List<MemberDto.ResponseDto> membersToResponses(List<Member> members);
 
+    @Mapping(source = "profileimg", target = "image")
+    Member AuthLoginDtoMember(AuthLoginDto authLoginDto);
 }

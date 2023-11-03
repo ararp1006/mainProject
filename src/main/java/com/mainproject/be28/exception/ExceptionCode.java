@@ -7,8 +7,9 @@ public enum ExceptionCode {
     MEMBER_NOT_FOUND(404, "Member not found"),
     MEMBER_EXISTS(409, "Member exists"),
     MEMBER_NOT_AUTHORIZED(401, "Member not authorized"),
-    POST_NOT_FOUND(404, "POST not found"),
-    ANSWER_NOT_FOUND(404, "Answer not found"),
+    MEMBER_IS_DELETED(404, "탈퇴한 회원입니다"),
+    MAILKEY_MISMATCH(400,"키가 일지하지않습니다."),
+
     ITEM_NOT_FOUND(404, "ITEM not found"),
     ITEM_EXIST(409, "동일한 상품명이 존재합니다."),
     CART_NOT_FOUND(404, "CART NOT FOUND"),
@@ -28,7 +29,12 @@ public enum ExceptionCode {
     ALREADY_CANCELED(404, "이미 취소된 주문입니다"),
     NOT_YET_PAID(404,"아직 결제가 안된 주문입니다"),
     VERIFY_FAILURE(401,"ID 혹은 PW가 일치하지 않습니다."),
-    USER_EXIST(409,"존재하는 사용자 입니다." );
+    USER_EXIST(409,"존재하는 사용자 입니다." ),
+    IMAGE_URL_ERROR(404, "이미지 경로를 찾을 수 없습니다"),
+    NO_PERMISSION_EDITING_POST(403,"작성자만 수정할 수 있습니다"),
+
+
+    JWT_TOKEN_EXPIRED(404, "토큰이 만료되었습니다");
 
     @Getter
     private final int status;

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.List;
 import javax.persistence.*;
 
 @Entity
@@ -49,7 +50,7 @@ public class Item extends Auditable {
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<ItemImage> Images = new ArrayList<>();
+    private List<ItemImage> images = new ArrayList<>();
 
 
 }

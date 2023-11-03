@@ -1,5 +1,6 @@
 package com.mainproject.be28.auth.handler;
 
+import com.mainproject.be28.auth.utils.ErrorResponder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,16 +13,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
 @Slf4j
-public class MemberDeniedHandler implements AccessDeniedHandler {
-
+@Component
+public class MemberAccessDeniedHandler implements AccessDeniedHandler {
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException{
+        ErrorResponder.sendErrorResponse(response, HttpStatus.FORBIDDEN);
+        log.warn("Forbidden error happened: {}", accessDeniedException.getMessage());
 
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        log.warn("Forbidden Error : {} ", accessDeniedException.getMessage());
+        // DaoAuthenticationProvider
     }
 }

@@ -25,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service @Slf4j
+@Service
+@Slf4j
 public class CartService {
     private final MemberService memberService;
     private final CartRepository cartRepository;

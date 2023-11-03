@@ -2,13 +2,13 @@ package com.mainproject.be28.item.service;
 
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
+import com.mainproject.be28.itemImage.entity.ItemImage;
+import com.mainproject.be28.itemImage.repository.ItemImageRepository;
 import com.mainproject.be28.item.dto.OnlyItemResponseDto;
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.item.mapper.ItemMapper;
 import com.mainproject.be28.item.repository.ItemRepository;
 import com.mainproject.be28.item.dto.ItemSearchConditionDto;
-import com.mainproject.be28.itemImage.entity.ItemImage;
-import com.mainproject.be28.itemImage.repository.ItemImageRepository;
 import com.mainproject.be28.itemImage.service.ItemImageService;
 import com.mainproject.be28.review.entity.Review;
 import com.mainproject.be28.utils.CustomBeanUtils;
@@ -24,13 +24,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 
+
 @Service
 @Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemMapper mapper;
     private final ItemImageService itemImageService;
-    private  final ItemImageRepository itemImageRepository;
+    private final ItemImageRepository itemImageRepository;
     private final CustomBeanUtils<Item> beanUtils;
 
     public ItemService(ItemRepository itemRepository, ItemMapper mapper, ItemImageService itemImageService, ItemImageRepository itemImageRepository, CustomBeanUtils<Item> beanUtils) {
@@ -48,23 +49,27 @@ public class ItemService {
             throw new BusinessLogicException(ExceptionCode.ITEM_EXIST);
         }
         List<ItemImage> images = new ArrayList<>();
-        if (itemImgFileList != null){
-           images = saveImage(item, itemImgFileList);
+        if (itemImgFileList != null) {
+            images = saveImage(item, itemImgFileList);
             item.setImages(images);
         }
         itemRepository.save(item); // 저장 순서 중요.
-        if(images.size()>0){itemImageRepository.saveAll(images);}
+        if (images.size() > 0) {
+            itemImageRepository.saveAll(images);
+        }
         return item;
     }
 
     public Item updateItem(Item item, List<MultipartFile> itemImgFileList) throws IOException {
         // todo: 관리자만 수정 권한 기능 추가 필요
-       Item findItem = findItem(item.getItemId());
+        Item findItem = findItem(item.getItemId());
         Item updatedItem =
                 beanUtils.copyNonNullProperties(item, findItem);
         List<ItemImage> images = new ArrayList<>();
         //기존 상품에 이미지가 있다면 다시 등록
-        if(findItem.getImages()!=null){ images = new ArrayList<>(findItem.getImages()); }
+        if (findItem.getImages() != null) {
+            images = new ArrayList<>(findItem.getImages());
+        }
 
         //새로운 파일 이미지가 있다면, 새로 추가
         if (itemImgFileList != null) {
@@ -74,7 +79,7 @@ public class ItemService {
             }
             //대표 이미지 설정이 안되어있다면, 맨 첫번째 이미지 대표이미지로 설정
             ItemImage repImg = images.get(0);
-            if(repImg.getRepresentationImage()==null||!repImg.getRepresentationImage().equals("YES")) {
+            if (repImg.getRepresentationImage() == null || !repImg.getRepresentationImage().equals("YES")) {
                 repImg.setRepresentationImage("YES");
                 images.set(0, repImg);
             }
@@ -88,21 +93,21 @@ public class ItemService {
 
     }
 
-    public Item findItem(long itemId){
+    public Item findItem(long itemId) {
 
         Optional<Item> optionalItem =
                 itemRepository.findById(itemId);
-        Item item  = optionalItem.orElseThrow(() -> new BusinessLogicException(ExceptionCode.ITEM_NOT_FOUND));
+        Item item = optionalItem.orElseThrow(() -> new BusinessLogicException(ExceptionCode.ITEM_NOT_FOUND));
         item.setReviewCount(item.getReviews().size());
         item.setScore(updateScore(item));
         return item;
     }
 
-    public Page<OnlyItemResponseDto> findItems(ItemSearchConditionDto condition){
-        PageRequest pageRequest = PageRequest.of(condition.getPage()-1, condition.getSize());
+    public Page<OnlyItemResponseDto> findItems(ItemSearchConditionDto condition) {
+        PageRequest pageRequest = PageRequest.of(condition.getPage() - 1, condition.getSize());
         List<OnlyItemResponseDto> itemList = itemRepository.searchByCondition(condition, pageRequest);
 
-        for(OnlyItemResponseDto onlyItemResponseDto : itemList){ // 리뷰 평균 평점, 리뷰 수
+        for (OnlyItemResponseDto onlyItemResponseDto : itemList) { // 리뷰 평균 평점, 리뷰 수
             Item item = itemRepository.findItemByName(mapper.onlyItemResponseDtotoItem(onlyItemResponseDto).getName());
             onlyItemResponseDto.setReviewCount(item.getReviews().size());
             onlyItemResponseDto.setScore(updateScore(item));
@@ -110,25 +115,29 @@ public class ItemService {
 
         return new PageImpl<>(itemList, pageRequest, itemList.size());
     }
-    public void deleteItem(long itemId){
+
+    public void deleteItem(long itemId) {
 
         Item findItem = findItem(itemId);
         // todo: 관리자만 권한삭제 기능 추가 필요
         itemRepository.delete(findItem);
     }
 
-    private Double updateScore(Item item){
-        if(item.getScore()==null){item.setScore(0.0);}
+    private Double updateScore(Item item) {
+        if (item.getScore() == null) {
+            item.setScore(0.0);
+        }
         List<Review> itemList = item.getReviews();
         double score = 0D;
         for (Review review : itemList) {
             score += review.getScore();
         }
         score /= item.getReviews().size();
-        score = (double)Math.round(score*100)/100;
+        score = (double) Math.round(score * 100) / 100;
         return score;
     }
-    private List<ItemImage> saveImage(Item item,List<MultipartFile> itemImgFileList ) throws IOException {
+
+    private List<ItemImage> saveImage(Item item, List<MultipartFile> itemImgFileList) throws IOException {
         List<ItemImage> images = new ArrayList<>();
         for (int i = 0; i < itemImgFileList.size(); i++) {
             MultipartFile file = itemImgFileList.get(i);
@@ -142,6 +151,7 @@ public class ItemService {
         }
         return images;
     }
+}
 
 
 
@@ -152,4 +162,3 @@ public class ItemService {
         return tokenMemberId == adminId;
 }
 */
-}

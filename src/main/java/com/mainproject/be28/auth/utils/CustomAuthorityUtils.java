@@ -1,6 +1,6 @@
-package com.mainproject.be28.utils;
+package com.mainproject.be28.auth.utils;
 
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class CustomAuthorityUtils {
+    @Value("${mail.address.admin}")
     private String adminMailAddress;
 
     private final List<GrantedAuthority> ADMIN_ROLES = AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER");

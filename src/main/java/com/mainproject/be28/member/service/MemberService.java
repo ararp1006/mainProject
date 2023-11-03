@@ -1,104 +1,214 @@
 package com.mainproject.be28.member.service;
 
 
-import com.mainproject.be28.auth.userdetails.MemberAuthority;
-import com.mainproject.be28.comment.repository.CommentRepository;
+import com.mainproject.be28.auth.jwt.JwtTokenizer;
+import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Slf4j
+@Component
 public class MemberService {
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MemberAuthority memberAuthority;
+    private final CustomAuthorityUtils authorityUtils;
+    private final JwtTokenizer jwtTokenizer;
 
 
-    //회원생성
     public Member createMember(Member member) {
-        verifyExistsEmail(member.getEmail());
+        verifyExistEmail(member.getEmail());
+        member.setName(verifyExistName(member.getName()));   //중복되는 이름 확인 후 중복되는 이름이 있을 시 뒤에 0~9999까지 번호를 붙여서 이름 저장
+
+        // (3) 추가: Password 암호화
         String encryptedPassword = passwordEncoder.encode(member.getPassword());
-        String encryptedPhone = passwordEncoder.encode(member.getPhone());
-        String encryptedAdress = passwordEncoder.encode(member.getAddress());
         member.setPassword(encryptedPassword);
-        member.setPhone(encryptedPhone);
-        member.setAddress(encryptedAdress);
-        member.setRoles(memberAuthority.createRoles(member.getName()));
-//        isAdmin(member.getRoles());
+
+        // (4) 추가: DB에 User Role 저장
+        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        member.setRoles(roles);
+
         Member savedMember = memberRepository.save(member);
 
         return savedMember;
     }
 
-    public boolean isAdmin(List<String> roles){
-        boolean admin = false;
-        for(String role : roles){
-            if(role.equals("ADMIN")){admin = true; break;}
-        }
-        return admin;
+   /* public Member uploadImage(long memberId, MultipartFile imageFile) {
+        Member findMember = findVerifiedMember(memberId);
+        String fileUrl = fileStorageService.storeFile(imageFile);
+        findMember.setImage(fileUrl);
+
+        return memberRepository.save(findMember);
+    }*/
+
+    public Member createMemberOAuth2(Member member) {
+
+        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        member.setRoles(roles);
+        String newName = verifyExistName(member.getName());
+        member.setName(newName);
+
+        return memberRepository.save(member);
     }
 
-    // 회원이 존재하는지 검사 , 존재하면 예외
-    private void verifyExistsEmail(String email) {
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new BusinessLogicException(ExceptionCode.USER_EXIST);
-        }
-    }
-
-
-    public Member findMember(Long memberId) {
+    public Member findMember(long memberId) {
         return findVerifiedMember(memberId);
     }
 
-    public Member findVerifiedMember(Long memberId){
-        Optional<Member> optionalMember =
-                memberRepository.findById(memberId);
-        Member findMember =
-                optionalMember.orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+    public Page<Member> findMembers(int page, int size) {
+        return memberRepository.findAll(PageRequest.of(page, size,
+                Sort.by("memberId").descending()));
+    }
+
+
+    @Transactional
+    public Member updateMember(Long loginId, Member member) {
+
+        verifyPermission(loginId, member.getMemberId());
+
+        Member findMember = findVerifiedMember(member.getMemberId());
+        if (member.getName() != findMember.getName()) {                   //수정하려는 이름과 기존 이름이 다를 경우 수정하는 이름이 중복되는지 체크후 중복시 추가숫자를 덧붙여 이름수정
+            findMember.setName(verifyExistName(member.getName()));
+        }
+
         return findMember;
     }
 
-    private Optional<Member> checkUserExist(String email) {
-        // 이메일을 사용하여 회원을 찾음
-        Optional<Member> user = memberRepository.findByEmail(email);
+    public Member updateActiveStatus(long memberId) {
+        Member findMember = findVerifiedMember(memberId);
+        findMember.setStatus(Member.Status.MEMBER_ACTIVE);
 
-        // 회원이 존재하지 않을 경우 Optional.empty() 반환
-        return user;
+        return findMember;
     }
 
+    public Member updateDeleteStatus(long memberId) {
+        Member findMember = findVerifiedMember(memberId);
+
+        findMember.setStatus(Member.Status.MEMBER_DELETE);
+        return findMember;
+    }
+
+    public void deleteMember(Long loginId, long memberId) {
+        verifyPermission(loginId, memberId);
+
+        Member findMember = findVerifiedMember(memberId);
+
+        memberRepository.delete(findMember);
+    }
+
+
+    public Member findVerifiedMember(long memberId) {
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        Member findMember = optionalMember.orElseThrow(() ->
+                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+
+
+        return findMember;
+    }
+
+    public Member findVerifiedMember(String email) {
+        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+        Member findMember = optionalMember.orElseThrow(() ->
+                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+
+
+        return findMember;
+    }
+
+    private void verifyExistEmail(String email) {
+        Optional<Member> member = memberRepository.findByEmail(email);
+        if (member.isPresent())
+            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+    }
+
+    public Boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    private String verifyExistName(String name) {     // oauth2로 로그인 했을 때 같은 이름이 있을 때 1~1000까지의 랜덤숫자를 붙임
+        String newName = name;
+        Optional<Member> optionalMember = memberRepository.findByName(name);
+        if (optionalMember.isPresent()) {
+            Random random = new Random();
+            int randomNumber = random.nextInt(10000) + 1;
+            newName = name + randomNumber;
+        }
+
+        return newName;
+    }
+
+    public void verifyPermission(Long loginId, long memeberId) {
+        Member findMember = findVerifiedMember(loginId);
+        if (!findMember.getRoles().contains("ADMIN")) {
+            if (loginId != memeberId) {
+                throw new BusinessLogicException(ExceptionCode.NO_PERMISSION_EDITING_POST);
+            }
+        }
+    }
+
+    public String delegateAccessToken(Member member) {//엑세스토큰 생성
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("memberId", member.getMemberId());
+        claims.put("roles", member.getRoles());
+
+        String subject = member.getEmail();
+        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
+
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+
+        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+
+        return accessToken;
+    }
+
+
+    public String delegateRefreshToken(Member member) {//리프레시 토큰 생성
+
+
+        String subject = member.getEmail();
+        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+
+        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
+
+        return refreshToken;
+    }
     public Long findTokenMemberId() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return memberRepository.findMemberByEmail(email).getMemberId();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        return member.getMemberId();
     }
     public Member findTokenMember() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return memberRepository.findMemberByEmail(email);
+        return memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND)) ;
     }
 
     //현재 로그인한 회원정보 접근 시 회원 이메일/비밀번호 한번더 검증
-    public void verifyEmailPassword(String email, String password) {
+    public Member verifyEmailPassword(String email, String password) {
+        Member currentMember = findTokenMember();
         String currentEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // 현재 로그인되어 있는 회원의 메일
-        Member member = memberRepository.findMemberByEmail(currentEmail); //현재 회원정보
-
-        String currentPassword = member.getPassword(); // 현재 로그인 되어있는 회원의 비밀번호
-
+        Member member = memberRepository.findByEmail(currentEmail).orElseThrow(() -> new BusinessLogicException(ExceptionCode.VERIFY_FAILURE));
+        boolean matchMember = member.equals(currentMember);
         boolean matchEmail = email.equals(currentEmail); //실제 이메일과 입력한 이메일이 일치하는지
-        boolean matchPassword = password.equals(currentPassword); // 실제 비밀번호와 입력한 비밀번확 일치하는지
-        if(!matchEmail||!matchPassword){
+        boolean matchPassword = passwordEncoder.matches(password, member.getPassword());
+        if(!matchMember||!matchEmail||!matchPassword){
             throw new BusinessLogicException(ExceptionCode.VERIFY_FAILURE); // 둘 중하나라도 다르다면 인증 실
         }
+        return member;
     }
 }

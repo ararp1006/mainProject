@@ -7,11 +7,12 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-@AllArgsConstructor
+
 @Getter
 public class MultiResponseDto<T> extends BaseResponse{
     private List<T> data;
     private PageInfo pageInfo;
+
 
     public MultiResponseDto(List<T> data, Page page, HttpStatus status) {
         this.status = status.value();

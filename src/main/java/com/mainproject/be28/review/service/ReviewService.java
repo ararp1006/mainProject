@@ -2,7 +2,6 @@ package com.mainproject.be28.review.service;
 
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
-import com.mainproject.be28.review.dto.ReviewResponseDto;
 import com.mainproject.be28.review.entity.Review;
 import com.mainproject.be28.review.repository.ReviewRepository;
 import com.mainproject.be28.utils.CustomBeanUtils;

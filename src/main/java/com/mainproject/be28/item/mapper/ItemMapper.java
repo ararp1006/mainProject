@@ -37,12 +37,12 @@ public interface ItemMapper {
             for (ItemImage image : imageList) {
                 ItemImageResponseDto itemImageResponseDto =
                         ItemImageResponseDto.builder()
-                        . itemId(image.getItem().getItemId())
-                        .itemImageId(image.getItemImageId())
-                        .imageName(image.getImageName())
-                        .URL(image.getBaseUrl() + image.getImageName())
-                        .representationImage(image.getRepresentationImage())
-                        .build();
+                                . itemId(image.getItem().getItemId())
+                                .itemImageId(image.getItemImageId())
+                                .imageName(image.getImageName())
+                                .URL(image.getBaseUrl() + image.getImageName())
+                                .representationImage(image.getRepresentationImage())
+                                .build();
                 itemImageResponseDtos.add(itemImageResponseDto);
             }
         }
