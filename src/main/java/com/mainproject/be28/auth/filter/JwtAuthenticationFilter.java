@@ -6,6 +6,7 @@ import com.mainproject.be28.auth.jwt.JwtTokenizer;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.member.entity.Member;
+import com.mainproject.be28.member.excption.MemberException;
 import com.mainproject.be28.member.repository.MemberRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +60,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Optional<Member> optionalMember = memberRepository.findByEmail(loginDto.getEmail());
 
         Member findMember = optionalMember.orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+                new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
 
         if (findMember.getStatus() == Member.Status.MEMBER_DELETE) {
-            throw new BusinessLogicException(ExceptionCode.MEMBER_IS_DELETED);
+            throw new BusinessLogicException(MemberException.MEMBER_IS_DELETED);
         }
 
         // (3-3)

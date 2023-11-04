@@ -1,53 +1,48 @@
 package com.mainproject.be28.item.mapper;
 
+import com.mainproject.be28.image.entity.ImageInfo;
 import com.mainproject.be28.item.dto.ItemDto;
 import com.mainproject.be28.item.dto.OnlyItemResponseDto;
 import com.mainproject.be28.item.entity.Item;
-import com.mainproject.be28.itemImage.dto.ItemImageResponseDto;
-import com.mainproject.be28.itemImage.entity.ItemImage;
 import com.mainproject.be28.review.dto.ReviewResponseDto;
 import com.mainproject.be28.review.entity.Review;
 import org.mapstruct.Mapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
-    Item itemPostDtoToItem(ItemDto.Post itemPostDto);
-    Item  itemPatchDtoToItem(ItemDto.Patch itemPatchDto);
-    OnlyItemResponseDto itemToOnlyItemResponseDto(Item item);
-    Item onlyItemResponseDtotoItem(OnlyItemResponseDto onlyItemResponseDto);
-
-    default ItemDto.Response itemToItemResponseDto(Item item) {
-
-        OnlyItemResponseDto onlyitemResponseDto = itemToOnlyItemResponseDto(item);
-
-        List<ReviewResponseDto> reviewResponseDtos = getReviewsResponseDto(item);
-        List<ItemImageResponseDto> itemImageResponseDtos = getImageResponseDto(item);
-
-        return new ItemDto.Response(onlyitemResponseDto, reviewResponseDtos, itemImageResponseDtos);
+    default Item itemDtoToItem(ItemDto.Post itemDto) {
+        return Item.builder().name(itemDto.getName())
+                .status(itemDto.getStatus())
+                .detail(itemDto.getDetail())
+                .price(itemDto.getPrice())
+                .color(itemDto.getColor())
+                .brand(itemDto.getBrand())
+                . category(itemDto.getCategory())
+                .build();
     }
+    default List<OnlyItemResponseDto> itemToItemResponseDto(List<Item> items){
+        return items.stream().map(item ->{
+            OnlyItemResponseDto onlyItemResponseDto = OnlyItemResponseDto.builder()
+                    .itemId(item.getItemId())
+                    .name(item.getName())
+                    .price(item.getPrice())
+                    .detail(item.getDetail())
+                    .status(item.getStatus())
+                    .build();
 
-    default List<ItemImageResponseDto> getImageResponseDto(Item item){
-        List<ItemImageResponseDto> itemImageResponseDtos = new ArrayList<>();
-        List<ItemImage> imageList = item.getImages();
-
-        if (imageList != null) {
-            for (ItemImage image : imageList) {
-                ItemImageResponseDto itemImageResponseDto =
-                        ItemImageResponseDto.builder()
-                                . itemId(image.getItem().getItemId())
-                                .itemImageId(image.getItemImageId())
-                                .imageName(image.getImageName())
-                                .URL(image.getBaseUrl() + image.getImageName())
-                                .representationImage(image.getRepresentationImage())
-                                .build();
-                itemImageResponseDtos.add(itemImageResponseDto);
+            if(item.getItemImage()!=null){
+                ImageInfo imageInfo = item.getItemImage().get(1).getImageInfo();
+                onlyItemResponseDto.setImagePath(imageInfo.getBaseUrl()+imageInfo.getFilePath()+imageInfo.getImageName());
             }
-        }
-        return itemImageResponseDtos;
+
+            return onlyItemResponseDto;
+        }).collect(Collectors.toList());
     }
+
 
     default List<ReviewResponseDto> getReviewsResponseDto(Item item) {
         List<ReviewResponseDto> reviewResponseDtos = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.mainproject.be28.cart.service;
 
 import com.mainproject.be28.cart.entity.Cart;
+import com.mainproject.be28.cart.exception.CartException;
 import com.mainproject.be28.cart.repository.CartRepository;
 import com.mainproject.be28.cartItem.dto.CartItemDto;
 import com.mainproject.be28.cartItem.entity.CartItem;
@@ -87,7 +88,7 @@ public class CartService {
 
         for (CartOrderDto cartOrderDto : cartOrderDtoList) {
             CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId())
-                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CART_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessLogicException(CartException.CART_NOT_FOUND));
 
             // CartOrderDto를 OrderItemPostDto로 변환
             OrderItemPostDto orderDto = new OrderItemPostDto();
@@ -104,7 +105,7 @@ public class CartService {
         // 주문한 장바구니 상품을 제거
         for (CartOrderDto cartOrderDto : cartOrderDtoList) {
             CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId())
-                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CART_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessLogicException(CartException.CART_NOT_FOUND));
             cartItemRepository.delete(cartItem);
         }
 

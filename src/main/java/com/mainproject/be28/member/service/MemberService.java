@@ -6,6 +6,7 @@ import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.member.entity.Member;
+import com.mainproject.be28.member.excption.MemberException;
 import com.mainproject.be28.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -115,7 +116,7 @@ public class MemberService {
     public Member findVerifiedMember(long memberId) {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member findMember = optionalMember.orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+                new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
 
 
         return findMember;
@@ -124,7 +125,7 @@ public class MemberService {
     public Member findVerifiedMember(String email) {
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
         Member findMember = optionalMember.orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+                new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
 
 
         return findMember;
@@ -133,7 +134,7 @@ public class MemberService {
     private void verifyExistEmail(String email) {
         Optional<Member> member = memberRepository.findByEmail(email);
         if (member.isPresent())
-            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+            throw new BusinessLogicException(MemberException.MEMBER_EXISTS);
     }
 
     public Boolean existsByEmail(String email) {
@@ -156,7 +157,7 @@ public class MemberService {
         Member findMember = findVerifiedMember(loginId);
         if (!findMember.getRoles().contains("ADMIN")) {
             if (loginId != memeberId) {
-                throw new BusinessLogicException(ExceptionCode.NO_PERMISSION_EDITING_POST);
+                throw new BusinessLogicException(MemberException.NO_PERMISSION_EDITING_POST);
             }
         }
     }
@@ -190,24 +191,24 @@ public class MemberService {
     }
     public Long findTokenMemberId() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
         return member.getMemberId();
     }
     public Member findTokenMember() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND)) ;
+        return memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND)) ;
     }
 
     //현재 로그인한 회원정보 접근 시 회원 이메일/비밀번호 한번더 검증
     public Member verifyEmailPassword(String email, String password) {
         Member currentMember = findTokenMember();
         String currentEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // 현재 로그인되어 있는 회원의 메일
-        Member member = memberRepository.findByEmail(currentEmail).orElseThrow(() -> new BusinessLogicException(ExceptionCode.VERIFY_FAILURE));
+        Member member = memberRepository.findByEmail(currentEmail).orElseThrow(() -> new BusinessLogicException(MemberException.VERIFY_FAILURE));
         boolean matchMember = member.equals(currentMember);
         boolean matchEmail = email.equals(currentEmail); //실제 이메일과 입력한 이메일이 일치하는지
         boolean matchPassword = passwordEncoder.matches(password, member.getPassword());
         if(!matchMember||!matchEmail||!matchPassword){
-            throw new BusinessLogicException(ExceptionCode.VERIFY_FAILURE); // 둘 중하나라도 다르다면 인증 실
+            throw new BusinessLogicException(MemberException.VERIFY_FAILURE); // 둘 중하나라도 다르다면 인증 실
         }
         return member;
     }

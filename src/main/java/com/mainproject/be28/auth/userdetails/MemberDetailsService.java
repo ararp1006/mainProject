@@ -2,8 +2,8 @@ package com.mainproject.be28.auth.userdetails;
 
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import com.mainproject.be28.exception.BusinessLogicException;
-import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.member.entity.Member;
+import com.mainproject.be28.member.excption.MemberException;
 import com.mainproject.be28.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Member> optionalMember = memberRepository.findByEmail(username);
-        Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
 
         return new MemberDetails(findMember);
     }

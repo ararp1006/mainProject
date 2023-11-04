@@ -1,11 +1,11 @@
 package com.mainproject.be28.complain.service;
 
+import com.mainproject.be28.complain.complainException.ComplainException;
 import com.mainproject.be28.complain.dto.ComplainPostDto;
 import com.mainproject.be28.complain.entity.Complain;
 import com.mainproject.be28.complain.mapper.ComplainMapper;
 import com.mainproject.be28.complain.repository.ComplainRepository;
 import com.mainproject.be28.exception.BusinessLogicException;
-import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.item.service.ItemService;
 import com.mainproject.be28.member.entity.Member;
@@ -52,7 +52,7 @@ public class ComplainService {
     public Complain findComplain(Long complainId){
         Optional<Complain> optionalComplain
                 = complainRepository.findById(complainId);
-        Complain findComplain =optionalComplain.orElseThrow(() -> new BusinessLogicException(ExceptionCode.Complain_NOT_FOUND));
+        Complain findComplain =optionalComplain.orElseThrow(() -> new BusinessLogicException(ComplainException.Complain_NOT_FOUND));
 
         return findComplain;
 }
@@ -86,7 +86,7 @@ public class ComplainService {
     }
     private void VerifiedNoComplain(Page<Complain> findAllComplain){
         if(findAllComplain.getTotalElements()==0){
-            throw new BusinessLogicException(ExceptionCode.Complain_NOT_FOUND);
+            throw new BusinessLogicException(ComplainException.Complain_NOT_FOUND);
         }
     }
     }

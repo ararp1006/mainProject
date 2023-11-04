@@ -3,6 +3,7 @@ package com.mainproject.be28.review.service;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.review.entity.Review;
+import com.mainproject.be28.review.exception.ReviewException;
 import com.mainproject.be28.review.repository.ReviewRepository;
 import com.mainproject.be28.utils.CustomBeanUtils;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class ReviewService {
     //리뷰아이디로 리뷰찾기
     public Review findReview(long reviewId) {
         Optional<Review> review = reviewRepository.findById(reviewId);
-        return review.orElseThrow(() -> new BusinessLogicException(ExceptionCode.Review_NOT_FOUND));
+        return review.orElseThrow(() -> new BusinessLogicException(ReviewException.Review_NOT_FOUND));
     }
     //리뷰 삭제
     public void deleteReview(long reviewId){

@@ -1,6 +1,7 @@
 package com.mainproject.be28.order.service;
 
 
+import com.mainproject.be28.cart.exception.CartException;
 import com.mainproject.be28.cartItem.repository.CartItemRepository;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
@@ -14,6 +15,7 @@ import com.mainproject.be28.order.data.OrderStatus;
 import com.mainproject.be28.order.dto.OrderPatchStatusDto;
 import com.mainproject.be28.order.dto.OrderPostDto;
 import com.mainproject.be28.order.entity.Order;
+import com.mainproject.be28.order.exception.OrderException;
 import com.mainproject.be28.order.repository.OrderRepository;
 import com.mainproject.be28.orderItem.dto.OrderItemPostDto;
 import com.mainproject.be28.orderItem.entity.OrderItem;
@@ -58,10 +60,10 @@ public class OrderService {
         else {
             Optional<List<OrderItemPostDto>> orderItemsOptional = Optional.ofNullable(orderPostDto.getOrderItems());
             if (!orderItemsOptional.isPresent()) {
-                throw new BusinessLogicException(ExceptionCode.ORDER_ITME_NO_FOUND );
+                throw new BusinessLogicException(OrderException.ORDER_ITME_NO_FOUND );
             }
             // 주문 아이템이나 주문 정보가 유효하지 않은 경우 예외 처리 또는 기본 로직 추가
-            throw new BusinessLogicException(ExceptionCode.INVALID_ORDER_DATA);
+            throw new BusinessLogicException(OrderException.INVALID_ORDER_DATA);
         }
     }
 
@@ -102,17 +104,17 @@ public class OrderService {
     //주문번호로 주문찾기
     public Order findByOrderNumber(String orderNumber) {
         Optional<Order> order = orderRepository.findByOrderNumber(orderNumber);
-        return order.orElseThrow(() -> new BusinessLogicException(ExceptionCode.ORDER_NOT_FOUND));
+        return order.orElseThrow(() -> new BusinessLogicException(OrderException.ORDER_NOT_FOUND));
     }
     //주문아이디로 주문찾기
     public Order findOrder(long orderId) {
         Optional<Order> order = orderRepository.findById(orderId);
-        return order.orElseThrow(() -> new BusinessLogicException(ExceptionCode.ORDER_NOT_FOUND));
+        return order.orElseThrow(() -> new BusinessLogicException(OrderException.ORDER_NOT_FOUND));
     }
     // 로그인한 유저가 주문자인지 확인
     public void checkOrderHolder(Order order, long memberId) {
         if (!order.getMember().isSameMemberId(memberId)) {
-            throw new BusinessLogicException(ExceptionCode.NOT_ORDER_HOLDER);
+            throw new BusinessLogicException(OrderException.NOT_ORDER_HOLDER);
         }
     }
     //주문내역 확인
@@ -124,7 +126,7 @@ public class OrderService {
     public void checkOrderHolder(String orderNumber, Long memberId) {
         long orderHolderId = findByOrderNumber(orderNumber).getMember().getMemberId();
         if(orderHolderId != memberId) {
-            throw new BusinessLogicException(ExceptionCode.NOT_ORDER_HOLDER);
+            throw new BusinessLogicException(OrderException.NOT_ORDER_HOLDER);
         }
     }
     //주문취소
@@ -138,9 +140,9 @@ public class OrderService {
             // 주문 취소 메서드 필요 (아임포트)
             order.cancelOrder();
         } else if (index == 5) {
-            throw new BusinessLogicException(ExceptionCode.ALREADY_APPLIED_REFUND);
+            throw new BusinessLogicException(OrderException.ALREADY_APPLIED_REFUND);
         } else if (index == 2) {
-            throw new BusinessLogicException(ExceptionCode.ALREADY_CANCELED);
+            throw new BusinessLogicException(OrderException.ALREADY_CANCELED);
         } else {
             orderRepository.delete(order);
         }
@@ -173,7 +175,7 @@ public class OrderService {
 
         for (OrderItemPostDto cartOrderDto : orderDtoList) {
             Item item = itemRepository.findById(cartOrderDto.getItemId())
-                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CART_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessLogicException(CartException.CART_NOT_FOUND));
             OrderItem orderItem = OrderItem.createOrderItem(item, cartOrderDto.getQuantity());
             orderItemList.add(orderItem);
         }

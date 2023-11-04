@@ -3,6 +3,7 @@ package com.mainproject.be28.auth.jwt;
 
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
+import com.mainproject.be28.member.excption.MemberException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -93,7 +94,7 @@ public class JwtTokenizer {
                     .build()
                     .parseClaimsJws(jws);
         } catch (ExpiredJwtException exception) {
-            throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_EXPIRED);
+            throw new BusinessLogicException(MemberException.JWT_TOKEN_EXPIRED);
         }
     }
 

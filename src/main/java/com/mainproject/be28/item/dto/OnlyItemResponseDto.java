@@ -19,4 +19,6 @@ public class OnlyItemResponseDto {
     private String brand;
     private String category;
     private Integer reviewCount;
+    @Setter
+    private String imagePath;
 }

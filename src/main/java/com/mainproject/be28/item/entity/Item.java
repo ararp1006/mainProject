@@ -1,10 +1,9 @@
 package com.mainproject.be28.item.entity;
 
 import com.mainproject.be28.auditable.Auditable;
-import com.mainproject.be28.itemImage.entity.ItemImage;
+import com.mainproject.be28.image.entity.ItemImage;
 import com.mainproject.be28.review.entity.Review;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.*;
 import java.util.List;
@@ -12,8 +11,10 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
 @Setter
-@Table
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +47,24 @@ public class Item extends Auditable {
     @Transient
     private long reviewCount;
 
+    @Column(length = 100)
+    private Integer stock;
+    @Column
+    private boolean forSale;
+
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<ItemImage> images = new ArrayList<>();
+    private List<ItemImage> itemImage = new ArrayList<>();
 
+
+    public void patchItem(Item itemPatcher){
+        this.name = itemPatcher.getName();
+        this.color = itemPatcher.getColor();
+        this.price = itemPatcher.getPrice();
+        this.brand = itemPatcher.getBrand();
+
+    }
 
 }
