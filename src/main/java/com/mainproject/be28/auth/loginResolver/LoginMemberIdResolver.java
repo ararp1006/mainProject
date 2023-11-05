@@ -1,6 +1,6 @@
 package com.mainproject.be28.auth.loginResolver;
 
-import com.mainproject.be28.auth.dto.TokenPrincipalDto;
+import com.mainproject.be28.auth.dto.PrincipalDto;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -28,7 +28,7 @@ public class LoginMemberIdResolver implements HandlerMethodArgumentResolver {
             return -1L;
         }
 
-        TokenPrincipalDto castedPrincipal = (TokenPrincipalDto) principal;
+        PrincipalDto castedPrincipal = (PrincipalDto) principal;
 
         return castedPrincipal.getId();
     }

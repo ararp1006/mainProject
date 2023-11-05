@@ -1,11 +1,13 @@
 package com.mainproject.be28.member.mapper;
 
+import com.mainproject.be28.image.entity.MemberImage;
 import com.mainproject.be28.member.dto.AuthLoginDto;
 import com.mainproject.be28.member.dto.MemberDto;
 import com.mainproject.be28.member.entity.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
 
@@ -21,6 +23,5 @@ public interface MemberMapper {
 
     List<MemberDto.ResponseDto> membersToResponses(List<Member> members);
 
-    @Mapping(source = "profileimg", target = "image")
     Member AuthLoginDtoMember(AuthLoginDto authLoginDto);
 }

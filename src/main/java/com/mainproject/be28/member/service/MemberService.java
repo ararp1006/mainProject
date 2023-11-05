@@ -4,7 +4,7 @@ package com.mainproject.be28.member.service;
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import com.mainproject.be28.exception.BusinessLogicException;
-import com.mainproject.be28.exception.ExceptionCode;
+import com.mainproject.be28.member.data.MemberStatus;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.member.excption.MemberException;
 import com.mainproject.be28.member.repository.MemberRepository;
@@ -92,7 +92,7 @@ public class MemberService {
 
     public Member updateActiveStatus(long memberId) {
         Member findMember = findVerifiedMember(memberId);
-        findMember.setStatus(Member.Status.MEMBER_ACTIVE);
+        findMember.setStatus(MemberStatus.MEMBER_ACTIVE);
 
         return findMember;
     }
@@ -100,7 +100,7 @@ public class MemberService {
     public Member updateDeleteStatus(long memberId) {
         Member findMember = findVerifiedMember(memberId);
 
-        findMember.setStatus(Member.Status.MEMBER_DELETE);
+        findMember.setStatus(MemberStatus.MEMBER_DELETE);
         return findMember;
     }
 

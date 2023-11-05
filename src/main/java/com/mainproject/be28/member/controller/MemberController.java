@@ -40,13 +40,16 @@ public class MemberController {
 
     private final JwtTokenizer jwtTokenizer;
 
-
+//회원가입
     @PostMapping("/signup")
     public ResponseEntity postMember(@Valid @RequestBody MemberDto.PostDto requestBody) {
-        Member member = mapper.postToMember(requestBody);
+        log.info("##### CREATE MEMBER #####");
 
+        Member member = mapper.postToMember(requestBody);
         Member createdMember = memberService.createMember(member);
         URI location = UriCreator.createUri(MEMBER_DEFAULT_URL, createdMember.getMemberId());
+
+        //memberService.sendEmail(savedUser.getEmail(), savedUser.getMailKey(), savedUser.getId());
 
         return ResponseEntity.created(location).build();
     }
@@ -58,7 +61,7 @@ public class MemberController {
         String refreshToken = "";
         String memberId = "";
         Member member = mapper.AuthLoginDtoMember(requesBody);
-        member.setEmail(member.getEmail()+"2");   //Naver 유저인 경우 이메일 뒤에 2를 붙임
+        //member.setEmail(member.getEmail()+"2");   //Naver 유저인 경우 이메일 뒤에 2를 붙임
 
         if(!memberService.existsByEmail(member.getEmail())) {
             member = memberService.createMemberOAuth2(member);

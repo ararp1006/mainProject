@@ -1,33 +1,45 @@
 package com.mainproject.be28.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig {
+import java.util.Collections;
 
+@EnableSwagger2
+@Configuration
+public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
-    public Docket restAPI() {
+    public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.mainproject"))
+                .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .apiInfo(apiInfo());
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("Spring Boot REST API")
-                .version("1.0.0")
-                .description("개발자들 swagger api")
-                .build();
+        return new ApiInfo(
+                "My MainProject API", // API의 제목
+                "쇼핑몰.", // API의 설명
+                "API TOS", // 서비스 약관의 URL
+                "Terms of service", // 서비스 약관
+                new Contact("John Doe", "www.example.com", "myeaddress@company.com"), // 연락처 정보
+                "License of API", "API license URL", Collections.emptyList()); // 라이센스 및 라이센스 URL
     }
 }

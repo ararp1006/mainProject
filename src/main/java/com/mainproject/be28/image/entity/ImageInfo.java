@@ -21,5 +21,5 @@ public class ImageInfo {
     @Column(nullable = false)
     private String filePath;
     @Transient
-    private final String baseUrl = "http://28be.s3-website.ap-northeast-2.amazonaws.com/";
+    private final String baseUrl = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com/";
 }

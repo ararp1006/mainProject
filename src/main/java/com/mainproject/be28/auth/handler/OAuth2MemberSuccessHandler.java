@@ -3,6 +3,7 @@ package com.mainproject.be28.auth.handler;
 
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
+import com.mainproject.be28.image.entity.MemberImage;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -24,78 +25,49 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
-@Slf4j
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenizer jwtTokenizer;
     private final CustomAuthorityUtils authorityUtils;
     private final MemberService memberService;
 
+    public OAuth2MemberSuccessHandler(JwtTokenizer jwtTokenizer,
+                                      CustomAuthorityUtils authorityUtils,
+                                      MemberService memberService) {
+        this.jwtTokenizer = jwtTokenizer;
+        this.authorityUtils = authorityUtils;
+        this.memberService = memberService;
+    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-
-        String name = (String) oAuth2User.getAttributes().get("name");
+        System.out.println("# Redirect to Frontend");
+        var oAuth2User = (OAuth2User)authentication.getPrincipal();
         String email = String.valueOf(oAuth2User.getAttributes().get("email"));
-        String image = (String) oAuth2User.getAttributes().get("picture");
-        if (image == null) {
-            image = (String) oAuth2User.getAttributes().get("profile_image");
-        }
-
-
-        // 얻은 email 주소로 권한 List 만들기
         List<String> authorities = authorityUtils.createRoles(email);
 
-        Member member = buildOAuth2Member(name, email, image);
-
-        if(!memberService.existsByEmail(member.getEmail())) {
-            Member savedMember = saveMember(member);
-            redirect(request, response, savedMember, authorities); // 리다이렉트를 하기위한 정보들을 보내줌
-        } else {
-            Member findMember = memberService.findVerifiedMember(member.getEmail());
-            redirect(request, response, findMember, authorities);
-        }
-
+        saveMember(email);
+        redirect(request, response, email, authorities);
     }
 
-    private Member buildOAuth2Member(String name, String email, String image) {
-        Member member = new Member();
-        member.setName(name);
-        member.setEmail(email+"1");
-        member.setImage(image);
-
-        return member;
+    private void saveMember(String email) {
+        Member member = new Member(email);
+        memberService.createMember(member);
     }
 
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String username, List<String> authorities) throws IOException {
+        String accessToken = delegateAccessToken(username, authorities);
+        String refreshToken = delegateRefreshToken(username);
 
-    private Member saveMember(Member member) {
-
-        return memberService.createMemberOAuth2(member);
-    }
-
-    private void redirect(HttpServletRequest request, HttpServletResponse response, Member member, List<String> authorities)
-            throws IOException {
-        String accessToken = delegateAccessToken(member, authorities);
-        String refreshToken = delegateRefreshToken(member);
-
-        String uri = createURI(request, accessToken, refreshToken).toString();
-
-        String headerValue = "Bearer " + accessToken;
-        response.setHeader("Authorization", headerValue);
-        response.setHeader("Refresh", refreshToken);
-
+        String uri = createURI(accessToken, refreshToken).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
-
     }
 
-    private String delegateAccessToken(Member member, List<String> authorities) {
-
+    private String delegateAccessToken(String username, List<String> authorities) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("memberId", member.getMemberId());
+        claims.put("username", username);
         claims.put("roles", authorities);
 
-        String subject = member.getEmail();
-
+        String subject = username;
         Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
 
         String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
@@ -105,11 +77,8 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return accessToken;
     }
 
-    private String delegateRefreshToken(Member member) {
-
-
-        String subject = member.getEmail();
-
+    private String delegateRefreshToken(String username) {
+        String subject = username;
         Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
         String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
 
@@ -118,24 +87,20 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return refreshToken;
     }
 
-    private URI createURI(HttpServletRequest request, String accessToken, String refreshToken) {
-
+    private URI createURI(String accessToken, String refreshToken) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("access_token", accessToken);
         queryParams.add("refresh_token", refreshToken);
 
-        String serverName = request.getServerName();
-
         return UriComponentsBuilder
                 .newInstance()
-                .scheme("https")
-                .host("uncoversound.com")
-                .port(443)
-                //.port(80)   -> aws로 배포했을 때 싸용
-//                .port(3000)   //-> local 테스트용
-                .path("/oauthloading")            //리다이렉트 주소 (토큰이 포함된 url 을 받는 주소)
+                .scheme("http")
+                .host("localhost")
+//                .port(80)
+                .path("/receive-token.html")
                 .queryParams(queryParams)
                 .build()
                 .toUri();
     }
+
 }

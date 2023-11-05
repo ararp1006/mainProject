@@ -1,11 +1,15 @@
 package com.mainproject.be28.member.dto;
 
 
+import com.mainproject.be28.member.data.Address;
+import com.mainproject.be28.member.data.MemberStatus;
 import com.mainproject.be28.member.entity.Member;
+import com.mainproject.be28.order.data.DeliveryInformation;
 import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 public class MemberDto {
 
@@ -41,12 +45,14 @@ public class MemberDto {
     public static class ResponseDto {
 
         private long memberId;
-        private String name;
         private String email;
-        private String image;
-        private Member.Status status;
-
-        private String createdAt;
-        private String modifiedAt;
+        private String name;
+        private String phoneNumber;
+        private Address address;
+        private DeliveryInformation deliveryInformation;
+        private String imagePath;
+        private MemberStatus status;
+        private LocalDateTime createdDate;
+        private LocalDateTime lastModifiedDate;
     }
 }
