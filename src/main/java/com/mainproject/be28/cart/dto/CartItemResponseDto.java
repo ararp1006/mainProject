@@ -1,4 +1,4 @@
-package com.mainproject.be28.cartItem.dto;
+package com.mainproject.be28.cart.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

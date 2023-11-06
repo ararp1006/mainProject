@@ -2,9 +2,8 @@ package com.mainproject.be28.order.service;
 
 
 import com.mainproject.be28.cart.exception.CartException;
-import com.mainproject.be28.cartItem.repository.CartItemRepository;
+import com.mainproject.be28.cart.repository.CartItemRepository;
 import com.mainproject.be28.exception.BusinessLogicException;
-import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.item.repository.ItemRepository;
 import com.mainproject.be28.item.service.ItemService;

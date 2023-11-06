@@ -1,17 +1,17 @@
-package com.mainproject.be28.cartItem.entity;
+package com.mainproject.be28.cart.entity;
 
 import com.mainproject.be28.auditable.Auditable;
-import com.mainproject.be28.cart.entity.Cart;
 import com.mainproject.be28.item.entity.Item;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
 @Entity
-@Table
+@Getter
+@Builder
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CartItem extends Auditable {
 
         @Id
@@ -20,7 +20,7 @@ public class CartItem extends Auditable {
         private Long cartItemId;
 
         @Column(nullable = false)
-        private Long count;
+        private int quantity;
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "CART_ID", nullable = false)
@@ -30,15 +30,11 @@ public class CartItem extends Auditable {
         @JoinColumn(name = "ITEM_ID", nullable = false)
         private Item item;
 
-        public static CartItem createCartItem(Cart cart, Item item, long count) {
-                CartItem cartItem = new CartItem();
-                cartItem.setCart(cart);
-                cartItem.setItem(item);
-                cartItem.setCount(count);
-                return cartItem;
+        public CartItem(Item item, int quantity) {
+                this.item = item;
+                this.quantity = quantity;
         }
-
-        public void addCount(long count) {
-                this.count += count;
+        public void plusQuantity(int quantity){
+                this.quantity = this.getQuantity() + quantity;
         }
 }

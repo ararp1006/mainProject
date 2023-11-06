@@ -1,6 +1,7 @@
 package com.mainproject.be28.item.entity;
 
 import com.mainproject.be28.auditable.Auditable;
+import com.mainproject.be28.cart.entity.CartItem;
 import com.mainproject.be28.image.entity.ItemImage;
 import com.mainproject.be28.review.entity.Review;
 import lombok.*;
@@ -24,7 +25,7 @@ public class Item extends Auditable {
     private String name;
 
     @Column
-    private Long price;
+    private int price;
 
     @Column(length = 100)
     private String detail;
@@ -49,14 +50,17 @@ public class Item extends Auditable {
 
     @Column(length = 100)
     private Integer stock;
-    @Column
-    private boolean forSale;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean forSale = true;
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<ItemImage> itemImage = new ArrayList<>();
+
 
 
     public void patchItem(Item itemPatcher){

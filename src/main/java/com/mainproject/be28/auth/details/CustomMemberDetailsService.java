@@ -1,6 +1,5 @@
 package com.mainproject.be28.auth.details;
 
-import com.mainproject.be28.auth.userdetails.PrincipalDetails;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.member.entity.Member;

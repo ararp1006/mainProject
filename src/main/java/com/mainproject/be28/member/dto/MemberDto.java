@@ -3,12 +3,14 @@ package com.mainproject.be28.member.dto;
 
 import com.mainproject.be28.member.data.Address;
 import com.mainproject.be28.member.data.MemberStatus;
-import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.order.data.DeliveryInformation;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 public class MemberDto {
@@ -18,33 +20,37 @@ public class MemberDto {
     @NoArgsConstructor
     @Setter
     public static class PostDto{
-        @NotBlank
-        private String name;
-        @NotBlank
+        @NotNull
         @Email
         private String email;
-        @NotBlank
+        @NotNull
+        @Pattern(regexp = "(?=.*\\d{1,50})(?=.*[a-zA-Z]{1,50}).{8,20}$")
         private String password;
-
-
-    }
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PatchDto{
+        @NotNull
+        @Size(min = 2, max = 10)
         private String name;
 
+
+    }
+    @Data
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class PatchDto {
+        @NotNull
+        @Size(min = 2, max = 10)
+        private String name;
+        @Pattern(regexp = "01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$")
+        private String phoneNumber;
+        private Address address;
+        private DeliveryInformation deliveryInformation;
     }
 
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
+    @Data
     @AllArgsConstructor
     public static class ResponseDto {
 
-        private long memberId;
+        private Long id;
         private String email;
         private String name;
         private String phoneNumber;

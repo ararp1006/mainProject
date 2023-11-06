@@ -1,37 +1,46 @@
 package com.mainproject.be28.cart.entity;
 
 import com.mainproject.be28.auditable.Auditable;
-import com.mainproject.be28.cartItem.entity.CartItem;
 import com.mainproject.be28.member.entity.Member;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
-@Table
-@Slf4j
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends Auditable  {
     @Id
+    @Column(name = "CART_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column()
-    private Long cartId;
+    private long cartId;
 
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_ID", nullable = false)
+    @Column(nullable = false)
+    @Builder.Default
+    @Setter
+    private int totalPrice = 0;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_Id")
     private Member member;
 
-    @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems = new ArrayList<>();
 
-    public static Cart createCart(Member member) {
-        Cart cart = new Cart();
-        cart.setMember(member);
-
-        return cart;
+    public void addCartItem(CartItem cartItem) {
+        if (cartItem != null) {
+            this.cartItems.add(cartItem);
+        }
     }
+    public void calculateTotalPrice() {
+        this.totalPrice = this.getCartItems().stream().mapToInt(cartItem ->
+                        cartItem.getQuantity() * cartItem.getItem().getPrice())
+                .sum();
+    }
+
+
 }

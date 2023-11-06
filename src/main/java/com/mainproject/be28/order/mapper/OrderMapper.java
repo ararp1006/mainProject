@@ -54,7 +54,7 @@ public interface OrderMapper {
             List<OrderItemResponseDto> orderItemResponseList = orderItems.stream().map(orderItem -> {
                 OrderItemResponseDto orderItemResponseDto = new OrderItemResponseDto();
                 orderItemResponseDto.setName(orderItem.getItem().getName());
-                orderItemResponseDto.setPrice(orderItem.getItem().getPrice());
+                orderItemResponseDto.setPrice((long) orderItem.getItem().getPrice());
                 orderItemResponseDto.setQuantity(orderItem.getQuantity());
                 return orderItemResponseDto;
             }).collect(Collectors.toList());

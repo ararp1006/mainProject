@@ -3,9 +3,9 @@ package com.mainproject.be28.cart.mapper;
 import com.mainproject.be28.cart.dto.CartDto;
 import com.mainproject.be28.cart.entity.Cart;
 import com.mainproject.be28.cart.service.CartService;
-import com.mainproject.be28.cartItem.dto.CartItemResponseDto;
-import com.mainproject.be28.cartItem.entity.CartItem;
-import com.mainproject.be28.cartItem.repository.CartItemRepository;
+import com.mainproject.be28.cart.dto.CartItemResponseDto;
+import com.mainproject.be28.cart.entity.CartItem;
+import com.mainproject.be28.cart.repository.CartItemRepository;
 import com.mainproject.be28.member.service.MemberService;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +25,7 @@ public class CartMapperImpl implements CartMapper{
     }
 
     public CartDto.Response cartToCartResponseDto(Cart cart) {
-        if (cart == null) {
-            Cart.createCart(memberService.findTokenMember());
-        }
+
         List<CartItemResponseDto> cartItemResponseDtos = getCartItemsResponseDto(cart);
         long price = getTotalPrice(cartItemResponseDtos);
         return new CartDto.Response(cartItemResponseDtos, price);
@@ -48,12 +46,12 @@ public class CartMapperImpl implements CartMapper{
         List<CartItem> cartItems = cart.getCartItems();
         if (cartItems != null) {
             for (CartItem cartItem : cartItems) {
-                if (cartItem.getCount() != 0) {
+                if (cartItem.getQuantity()!= 0) {
                     CartItemResponseDto cartItemDto =
                             CartItemResponseDto.builder()
                                     .cartItemId(cartItem.getCartItemId())
                                     .itemId(cartItem.getItem().getItemId())
-                                    .count(cartItem.getCount())
+                                    .count((long) cartItem.getQuantity())
                                     .name(cartItem.getItem().getName())
                                     .price(cartItem.getItem().getPrice())
                                     .build();

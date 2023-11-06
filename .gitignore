@@ -38,3 +38,5 @@ out/
 ### my ignore ###
 src/main/resources/application.yml
 src/main/resources/application-test.yml
+src/main/resources/application.properties
+src/main/com/mainproject/be28/config/MailConfig

@@ -1,6 +1,6 @@
-package com.mainproject.be28.cartItem.repository;
+package com.mainproject.be28.cart.repository;
 
-import com.mainproject.be28.cartItem.entity.CartItem;
+import com.mainproject.be28.cart.entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

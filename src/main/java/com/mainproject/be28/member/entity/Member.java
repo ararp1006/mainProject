@@ -14,35 +14,33 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 import lombok.Builder.Default;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import static javax.persistence.FetchType.EAGER;
 
 @Entity
 @Getter
 @Builder
-@Setter
+@NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 public class Member extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
+    @Setter
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String email;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     @Setter
     @Default
     private String phoneNumber = "";
@@ -69,8 +67,10 @@ public class Member extends Auditable {
 
     //이메일 인증이 되었는지 확인하는 키
     @Default
+    @Setter
     private String mailKey = "";
 
+    @Setter
     @Embedded
     @Default
     @AttributeOverride(name = "name", column = @Column(name = "addressee"))
@@ -81,6 +81,7 @@ public class Member extends Auditable {
     private DeliveryInformation deliveryInformation = new DeliveryInformation();
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
     private Cart cart;
 
     @OneToMany(mappedBy = "member")
@@ -97,10 +98,7 @@ public class Member extends Auditable {
         this.roles = new ArrayList<>(member.getRoles()); // 깊은 복사를 하기 위해 새 ArrayList를 생성
     }
 
-    // 명시적으로 기본 생성자 추가 (필요한 경우)
-    public Member() {
-        // 기본 생성자의 바디는 비어 있거나 필요한 초기화 코드를 포함할 수 있습니다.
-    }
+
 
 
     public void addOrder(Order order) {

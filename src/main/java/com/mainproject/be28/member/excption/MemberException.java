@@ -8,14 +8,15 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum MemberException  implements ExceptionCode {
-    ONLY_ADMIN_CAN(HttpStatus.NOT_FOUND, "관리자 권한이 필요합니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "Member not found"),
-    MEMBER_EXISTS(HttpStatus.NOT_FOUND, "Member exists"),
-    MEMBER_IS_DELETED(HttpStatus.NOT_FOUND, "Member exists"),
-    NO_PERMISSION_EDITING_POST(HttpStatus.NOT_FOUND, "Member not authorized"),
-    MEMBER_NOT_AUTHORIZED(HttpStatus.NOT_FOUND, "Member not authorized"),
-    JWT_TOKEN_EXPIRED(HttpStatus.NOT_FOUND, "Member not authorized"),
-    VERIFY_FAILURE(HttpStatus.NOT_FOUND, "Member not authorized");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER Not Found"),
+    MEMBER_EXIST(HttpStatus.CONFLICT, "MEMBER is already Exist!"),
+    MAILKEY_MISMATCH(HttpStatus.CONFLICT, "Incorrect password."),
+    INCORRECT_PASSWORD(HttpStatus.CONFLICT, "Password"),
+    NOT_YET_AUTHENTICATE_EMAIL(HttpStatus.FORBIDDEN, "Do Not Authenticate Email Yet"),
+    NOT_ACTIVE_MEMBER(HttpStatus.FORBIDDEN, "This MEMBER Is Not Active"),
+    NOT_GOOGLE_MEMBER(HttpStatus.CONFLICT, "Not Google MEMBER"),
+    NO_PERMISSION_EDITING_POST(HttpStatus.FORBIDDEN, "This MEMBER Is Not Active"),
+    GOOGLE_MEMBER(HttpStatus.NOT_FOUND, "Google MEMBER");
 
     private final HttpStatus status;
     private final String message;

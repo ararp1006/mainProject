@@ -1,15 +1,14 @@
 package com.mainproject.be28.member.controller;
 
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
-import com.mainproject.be28.auth.loginResolver.LoginMemberId;
+import com.mainproject.be28.image.entity.ImageInfo;
 import com.mainproject.be28.member.dto.AuthLoginDto;
 import com.mainproject.be28.member.dto.MemberDto;
+import com.mainproject.be28.member.dto.PasswordPatchDto;
+import com.mainproject.be28.member.dto.Recovery;
 import com.mainproject.be28.member.mapper.MemberMapper;
+import com.mainproject.be28.member.service.MailService;
 import com.mainproject.be28.member.service.MemberService;
-import com.mainproject.be28.response.DataResponseDto;
-import com.mainproject.be28.response.MultiResponseDto;
-import com.mainproject.be28.response.MultiResponseDtos;
-import com.mainproject.be28.response.SingleResponseDto;
 import com.mainproject.be28.utils.UriCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +19,15 @@ import org.springframework.web.bind.annotation.*;
 import com.mainproject.be28.member.entity.Member;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -37,77 +41,136 @@ public class MemberController {
     private final static String MEMBER_DEFAULT_URL = "/members";
     private final MemberService memberService;
     private final MemberMapper mapper;
-
+    private final MailService mailService;
     private final JwtTokenizer jwtTokenizer;
 
-//회원가입
+    // 회원 가입
     @PostMapping("/signup")
-    public ResponseEntity postMember(@Valid @RequestBody MemberDto.PostDto requestBody) {
+    public ResponseEntity createMEMBER(@RequestBody @Valid MemberDto.PostDto postDto)
+            throws MessagingException, UnsupportedEncodingException {
         log.info("##### CREATE MEMBER #####");
 
-        Member member = mapper.postToMember(requestBody);
-        Member createdMember = memberService.createMember(member);
-        URI location = UriCreator.createUri(MEMBER_DEFAULT_URL, createdMember.getMemberId());
+        Member member = mapper. memberPostDtoToMember(postDto);
+        Member savedMember = memberService.createMember(member);
+        URI location = UriCreator.createUri(MEMBER_DEFAULT_URL, savedMember.getMemberId());
 
-        //memberService.sendEmail(savedUser.getEmail(), savedUser.getMailKey(), savedUser.getId());
+        mailService.sendEmail(savedMember.getEmail(), savedMember.getMailKey(), savedMember.getMemberId());
 
         return ResponseEntity.created(location).build();
     }
-    //  # 프론트엔드에서 네이버유저의 아이디와 비번을 알려주면 그걸 이용해 회원가입을 하고 토큰발급하는 방식
+    // Oauth 네이버
     @PostMapping("/oauth/signup/naver")
-    public ResponseEntity oAuth2LoginNaver(@RequestBody @Valid AuthLoginDto requesBody) {
+    public ResponseEntity oAuth2LoginNaver(@RequestBody @Valid AuthLoginDto dto) {
         log.info("### oauth2 login start! ###");
         String accessToken = "";
         String refreshToken = "";
-        String memberId = "";
-        Member member = mapper.AuthLoginDtoMember(requesBody);
-        //member.setEmail(member.getEmail()+"2");   //Naver 유저인 경우 이메일 뒤에 2를 붙임
+        Member member = mapper.AuthLoginDtoMember(dto);
 
         if(!memberService.existsByEmail(member.getEmail())) {
             member = memberService.createMemberOAuth2(member);
         } else {
-            member = memberService.findVerifiedMember(member.getEmail());
+            member = memberService.checkMemberExist(member.getEmail());
         }
 
         accessToken = memberService.delegateAccessToken(member);
         refreshToken = memberService.delegateRefreshToken(member);
-        memberId = String.valueOf(member.getMemberId());
         return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken)
-                .header("Refresh", refreshToken)
-                .header("MemberId", memberId).build();
+                .header("Refresh", refreshToken).build();
     }
-
+    // Oauth 카카오
     @PostMapping("/oauth/signup/kakao")
-    public ResponseEntity oAuth2LoginKakao(@RequestBody @Valid AuthLoginDto requesBody) {
+    public ResponseEntity oAuth2LoginKakao(@RequestBody @Valid AuthLoginDto dto) {
         log.info("### oauth2 login start! ###");
         String accessToken = "";
         String refreshToken = "";
-        String memberId = "";
-        Member member = mapper.AuthLoginDtoMember(requesBody);
-        member.setEmail(member.getEmail()+"3");
+
+        Member member = mapper.AuthLoginDtoMember(dto);
         if(!memberService.existsByEmail(member.getEmail())) {
             member = memberService.createMemberOAuth2(member);
         } else {
-            member = memberService.findVerifiedMember(member.getEmail());
+            member = memberService.checkMemberExist(member.getEmail());
         }
 
         accessToken = memberService.delegateAccessToken(member);
         refreshToken = memberService.delegateRefreshToken(member);
-        memberId = String.valueOf(member.getMemberId());
         return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken)
-                .header("Refresh", refreshToken)
-                .header("MemberId", memberId).build();
+                .header("Refresh", refreshToken).build();
+    }
+    // Oauth 구글
+    @PostMapping("/oauth/signup/gogle")
+    public ResponseEntity oAuth2Login(@RequestBody @Valid AuthLoginDto dto) {
+        log.info("### oauth2 login start! ###");
+        String accessToken = "";
+        String refreshToken = "";
+
+        Member member = mapper.AuthLoginDtoMember(dto);
+        if (!memberService.existsByEmail(member.getEmail())) {
+            member = memberService.authMemberSave(member);
+        } else {
+            member = memberService.checkMemberExist(member.getEmail());
+        }
+
+        accessToken = memberService.delegateAccessToken(member);
+        refreshToken =memberService.delegateRefreshToken(member);
+        return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken)
+                .header("Refresh", refreshToken).build();
     }
 
-    @GetMapping("/info")
-    public ResponseEntity getMemberInfo(@LoginMemberId Long memberId){
-        Member findMember = memberService.findMember(memberId);
-        MemberDto.ResponseDto response = mapper.memberToResponse(findMember);
+    //회원 삭제
+    @DeleteMapping
+    public ResponseEntity deleteUser(
+            Principal principal) {
+        log.info("############" + principal.getName());
+        String email = principal.getName();
+        log.info("##### DELETE USER #####");
+        log.info("### MEMBER EMAIL = {}", email);
+        memberService.deleteMember(email);
 
-        return new ResponseEntity<>(
-                new DataResponseDto<>(response), HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
+    //회원 정보 수정
+    @PatchMapping
+    public ResponseEntity updateUser(@RequestBody @Valid MemberDto.PatchDto patchDto,
+                                     Principal principal) {
+
+        log.info("##### UPDATE USER #####");
+        Member member = mapper.memberPatchDtoToMember(patchDto);
+        member.setEmail(principal.getName());
+        Member patchedMember = memberService.updatedMember(member);
+
+        return ResponseEntity.ok().build();
+    }
+
+    //회원 상세 정보 조회
+    @GetMapping
+    public ResponseEntity getUser(Principal principal) {
+        log.info("##### GET MEMBER #####");
+        Member findMember = memberService.checkMemberExist(principal.getName());
+        MemberDto.ResponseDto memberResponseDto = mapper.memberToMemberResponseDto(findMember);
+
+        if (findMember.getMemberImage() != null) {
+            ImageInfo imageInfo = findMember.getMemberImage().getImageInfo();
+            memberResponseDto.setImagePath(
+                    imageInfo.getBaseUrl() + imageInfo.getFilePath() + imageInfo.getImageName());
+
+        }
+        return ResponseEntity.ok(memberResponseDto);
+    }
+
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    public ResponseEntity updatePassword(Principal principal,
+                                         @RequestBody @Valid PasswordPatchDto passwordPatchDto) {
+        log.info("### PW 수정");
+        String password = passwordPatchDto.getPassword();
+        String afterPassword = passwordPatchDto.getAfterPassword();
+        log.info("###PW = " + password + ", AFTER PW = " + afterPassword);
+        memberService.updatePassword(principal.getName(), password, afterPassword);
+
+        return ResponseEntity.ok().build();
+    }
+    //로그아웃
     @PostMapping("/logout")
     public ResponseEntity logout(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -117,77 +180,85 @@ public class MemberController {
 
         return ResponseEntity.ok().body("Successfully logged out");
     }
-
-    /*@PostMapping("/image")
-    public ResponseEntity postImage(@LoginMemberId Long memberId,
-                                    @RequestParam("imageFile") MultipartFile imageFile) {
-        Member savedMember = memberService.uploadImage(memberId, imageFile);
-        MemberDto.ResponseDto response = mapper.memberToResponse(savedMember);
-
-        return new ResponseEntity<>((response),HttpStatus.OK);
-    }*/
-
-
-    @GetMapping("/{member-id}")
-    public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId){
-        Member findMember = memberService.findMember(memberId);
-        MemberDto.ResponseDto response = mapper.memberToResponse(findMember);
-        return new ResponseEntity<>(
-                new SingleResponseDto<>(response), HttpStatus.OK);
+    //이미지 업로드
+    @PostMapping("/image")
+    public ResponseEntity postUserImage(Principal principal,
+                                        @RequestBody MultipartFile file) {
+        Member findMember = memberService.checkMemberExist(principal.getName());
+        memberService.postMemberImage(findMember.getMemberId(), file);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping
+
+    //회원리스트
+    @GetMapping("/admin")
     public ResponseEntity getMembers(@Positive @RequestParam(value = "page", defaultValue = "1") int page,
                                      @Positive @RequestParam(value = "size", defaultValue = "20") int size){
         Page<Member> pageMember = memberService.findMembers(page -1, size);
         List<Member> members = pageMember.getContent();
         List<MemberDto.ResponseDto> response = mapper.membersToResponses(members);
 
-        return new ResponseEntity<>(
-                new MultiResponseDtos<>(response, pageMember), HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
+
     }
 
 
-    @PatchMapping("/{member-id}")
-    public ResponseEntity patchMember(@PathVariable("member-id") @Positive long memberId,
-                                      @LoginMemberId Long loginId,
-                                      @Valid @RequestBody MemberDto.PatchDto requestBody){
+  /*  // 이메일키 인증
+    @GetMapping("/email_auth")
+    public void getEmailAuth(@RequestParam("id") @Positive Long id,
+                             @RequestParam("mailKey") String mailKey,
+                             HttpServletResponse response) throws IOException {
 
-        Member member = mapper.patchToMember(requestBody);
-        member.setMemberId(memberId);
-        Member updatedMember = memberService.updateMember(loginId,member); //검증을 위한 메서드포함, loginId가 관리자가 아닌이상 memeberId와 다를 경우 권한없다는 오류 발생
-        MemberDto.ResponseDto response = mapper.memberToResponse(updatedMember);
-
-        return new ResponseEntity<>(
-                new SingleResponseDto<>(response), HttpStatus.OK);
+        memberService.mailKeyAuth(id, mailKey);
+        String redirectUri = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com/email/complete";
+        response.sendRedirect(redirectUri);
     }
 
-    @PatchMapping("/status/active/{member-id}")     // Status를 Active로 변경
-    public ResponseEntity patchStatusActive(@PathVariable("member-id") @Positive long memberId){
-        Member activeMember =memberService.updateActiveStatus(memberId);
+    // 리커버리 이메일 샌드
+    @PostMapping("/recovery/signup/send")
+    public ResponseEntity recoveryEmailSend(@RequestBody @Valid Recovery.RecoveryEmailSendDto dto)
+            throws MessagingException, UnsupportedEncodingException {
+        String emailSignUp = dto.getEmailSignUp();
+        String emailNeedToSend = dto.getEmailNeedToSend();
 
-        MemberDto.ResponseDto response = mapper.memberToResponse(activeMember);
+        memberService.recoveryEmailSend(emailSignUp, emailNeedToSend);
 
-        return new ResponseEntity<>((response), HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/status/delete/{member-id}")   // Status를 delete로 변경(로그인 못하게 막음)
-    public ResponseEntity patchStatusDelete(@PathVariable("member-id") @Positive long memberId){
+    @PostMapping("/recovery/password/send")
+    public ResponseEntity recoveryPWEmailSend(@RequestBody @Valid Recovery.RecoveryPWEmailSendDto dto)
+            throws MessagingException, UnsupportedEncodingException {
+        String email = dto.getEmail();
 
-        Member deleteMember  = memberService.updateDeleteStatus(memberId);
-
-        MemberDto.ResponseDto response = mapper.memberToResponse(deleteMember);
-
-        return new ResponseEntity<>((response), HttpStatus.OK);
+        memberService.recoveryPWEmailSend(email);
+        if (memberService.existsByEmail(email)){
+            Member findMember = memberService.checkMemberExist(email);
+            memberService.checkNotGoogleAuth(findMember);
+        }
+        return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{member-id}")    //Member 삭제
-    public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,
-                                       @LoginMemberId Long loginId){
+    // 리커버리 진행
+    @PatchMapping("/recovery")
+    public ResponseEntity recovery(@RequestBody @Valid Recovery.RecoveryPasswordPatchDto dto) {
+        String email = dto.getEmail();
+        String mailKey = dto.getMailKey();
+        String afterPassword = dto.getAfterPassword();
 
+        memberService.recovery(email, mailKey, afterPassword);
 
-        memberService.deleteMember(loginId,memberId); //검증을 위한 메서드포함, loginId가 관리자가 아닌이상 memeberId와 다를 경우 권한없다는 오류 발생
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok().build();
     }
+
+    //이메일 인증 다시 보내기
+    @GetMapping("/resend")
+    public ResponseEntity resend(Principal principal)
+            throws MessagingException, UnsupportedEncodingException {
+        String email = principal.getName();
+        Member findMember = memberService.checkMemberExist(email);
+        memberService.sendEmail(email, findMember.getMailKey(), findMember.getMemberId());
+
+        return ResponseEntity.ok().build();
+    }*/
 }

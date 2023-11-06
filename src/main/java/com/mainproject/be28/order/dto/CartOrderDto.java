@@ -1,7 +1,6 @@
 package com.mainproject.be28.order.dto;
 
 
-import com.mainproject.be28.cartItem.dto.CartItemDto;
 import lombok.Getter;
 import lombok.Setter;
 

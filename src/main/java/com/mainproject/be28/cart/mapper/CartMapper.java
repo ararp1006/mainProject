@@ -2,8 +2,7 @@ package com.mainproject.be28.cart.mapper;
 
 import com.mainproject.be28.cart.dto.CartDto;
 import com.mainproject.be28.cart.entity.Cart;
-import com.mainproject.be28.cartItem.dto.CartItemResponseDto;
-import org.mapstruct.Mapping;
+import com.mainproject.be28.cart.dto.CartItemResponseDto;
 
 import java.util.List;
 

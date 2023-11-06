@@ -18,7 +18,7 @@ public interface ItemMapper {
         return Item.builder().name(itemDto.getName())
                 .status(itemDto.getStatus())
                 .detail(itemDto.getDetail())
-                .price(itemDto.getPrice())
+                .price(Math.toIntExact(itemDto.getPrice()))
                 .color(itemDto.getColor())
                 .brand(itemDto.getBrand())
                 . category(itemDto.getCategory())
@@ -29,7 +29,7 @@ public interface ItemMapper {
             OnlyItemResponseDto onlyItemResponseDto = OnlyItemResponseDto.builder()
                     .itemId(item.getItemId())
                     .name(item.getName())
-                    .price(item.getPrice())
+                    .price((long) item.getPrice())
                     .detail(item.getDetail())
                     .status(item.getStatus())
                     .build();

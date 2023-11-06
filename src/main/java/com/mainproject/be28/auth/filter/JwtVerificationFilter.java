@@ -1,7 +1,6 @@
 package com.mainproject.be28.auth.filter;
 
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
-import com.mainproject.be28.auth.userdetails.CustomUserDetailsService;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -54,10 +53,12 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         return authorization == null || !authorization.startsWith("Bearer");
     }
 
+
+    // request 객체로 claims 객체 꺼내는 메서드
+
     private Map<String, Object> verifyJws(HttpServletRequest request) {
         String jws = request.getHeader("Authorization").replace("Bearer ", "");
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-        Map<String, Object> claims = jwtTokenizer.getClaims(jws, base64EncodedSecretKey).getBody();
+        Map<String, Object> claims = jwtTokenizer.getClaims(jws).getBody();
 
         return claims;
     }

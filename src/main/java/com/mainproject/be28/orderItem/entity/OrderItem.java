@@ -20,7 +20,7 @@ public class OrderItem {
     @Setter
     private Long quantity;
     @Setter
-    private Long price;
+    private int price;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,12 +44,12 @@ public class OrderItem {
             order.addOrderItem(this);
         }
     }
-    public static OrderItem createOrderItem(Item item, long quantity) {
+    public static OrderItem createOrderItem(Item item, int quantity) {
 
         OrderItem orderItem = new OrderItem();
         orderItem.setItem(item);
-        orderItem.setQuantity(quantity);
-        orderItem.setPrice(item.getPrice());
+        orderItem.setQuantity((long) quantity);
+        orderItem.setPrice( item.getPrice());
 
         return orderItem;
     }
