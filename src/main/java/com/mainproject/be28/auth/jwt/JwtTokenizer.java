@@ -1,7 +1,6 @@
 package com.mainproject.be28.auth.jwt;
 
-import com.mainproject.be28.auth.exception.JwtException;
-import com.mainproject.be28.exception.BusinessLogicException;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -40,13 +39,11 @@ public class JwtTokenizer {
         return Encoders.BASE64.encode(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Access Token 생성 메서드
     public String generateAccessToken(Map<String, Object> claims,
                                       String subject,
                                       Date expiration,
                                       String base64EncodedSecretKey) {
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
-
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -57,44 +54,42 @@ public class JwtTokenizer {
                 .compact();
     }
 
-    // Refresh Token 생성 메서드 : Access Token이 만료되었을 경우, Access Token을 새로 생성하는 토큰
-
     public String generateRefreshToken(String subject, Date expiration, String base64EncodedSecretKey) {
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
-        String refreshToken = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(Calendar.getInstance().getTime())
                 .setExpiration(expiration)
                 .signWith(key)
                 .compact();
-
-        return refreshToken;
     }
 
-    // 검증 후, Claims을 반환하는 용도
-    public Jws<Claims> getClaims(String jws) {
-
+    // 검증 후, Claims을 반환 하는 용도
+    public Jws<Claims> getClaims(String jws, String base64EncodedSecretKey) {
+        Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
         Jws<Claims> claims = Jwts.parserBuilder()
-                .setSigningKey(getKey())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(jws);
         return claims;
     }
+    public void addToTokenBlackList(String jws) {
+        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        Long expirationTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws)
+                .getBody().get("refreshTokenExpirationMinutes", Long.class);
 
-
+        tokenBlackList.put(jws, expirationTime);
+    }
     // 단순히 검증만 하는 용도로 쓰일 경우
-    public Jws<Claims> verifySignature(String jws) {
+    public void verifySignature(String jws, String base64EncodedSecretKey) {
+        Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getKey())
-                    .build()
-                    .parseClaimsJws(jws);
-        } catch (ExpiredJwtException exception) {
-            throw new BusinessLogicException(JwtException.JWT_TOKEN_EXPIRED);
-        }
+        Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(jws);
     }
 
     public Date getTokenExpiration(int expirationMinutes) {
@@ -111,22 +106,5 @@ public class JwtTokenizer {
 
         return key;
     }
-
-    public void addToTokenBlackList(String jws) {
-        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        Long expirationTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws)
-                .getBody().get("refreshTokenExpirationMinutes", Long.class);
-
-        tokenBlackList.put(jws, expirationTime);
-    }
-
-    private Key getKey() {
-        String base64EncodedSecretKey = encodeBase64SecretKey(getSecretKey());
-
-        return getKeyFromBase64EncodedKey(base64EncodedSecretKey);
-    }
-
-
-
 
 }

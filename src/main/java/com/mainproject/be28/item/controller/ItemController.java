@@ -11,6 +11,8 @@ import com.mainproject.be28.item.dto.ItemSearchConditionDto;
 import com.mainproject.be28.item.service.ItemService;
 import com.mainproject.be28.response.MultiResponseDto;
 import com.mainproject.be28.response.SingleResponseDto;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -70,8 +72,9 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PostMapping("/admin/items/{itemId}/image")
-    public ResponseEntity postItemImage(@PathVariable("itemId") @Positive Long itemId,
-                                           @RequestPart("file") List<MultipartFile> files) {
+    public ResponseEntity postItemImage(@ApiParam(value = "File to upload", required = true) @PathVariable("itemId") @Positive Long itemId,
+                                           @RequestPart("file") List<MultipartFile> files
+    ) {
         log.info("------uploadItemsImage------");
         itemService.uploadImages(itemId, files);
         return new ResponseEntity(HttpStatus.CREATED);

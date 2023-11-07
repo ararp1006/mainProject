@@ -22,20 +22,15 @@ import java.util.Random;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
+;
 import org.springframework.data.domain.Page;
 
 
@@ -211,7 +206,7 @@ public class MemberService {
 
     // 회원이 존재하지 않으면 예외발생 by email
     public  Member checkMemberExist(String email) {
-        return memberRepository.findByEmail(email)
+        return memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
     }
 
@@ -227,8 +222,8 @@ public class MemberService {
         log.info("member encryptedPassword = {}", encryptedPassword);
     }
 
-    //simple email sender
 
+    //simple email sender
 
     public String createCode() {
         Random random = new Random();
@@ -251,6 +246,17 @@ public class MemberService {
         }
         return key.toString();
     }
+
+    public void mailKeyAuth(Long id, String mailKey) {
+        Member findMember = checkMemberExist(id);
+        if (findMember.getMailKey().equals(mailKey)) {
+            findMember.setStatus(MemberStatus.MEMBER_ACTIVE);
+            memberRepository.save(findMember);
+        } else {
+            throw new BusinessLogicException(MemberException.MAILKEY_MISMATCH);
+        }
+    }
+
 
 /*
 
@@ -369,14 +375,7 @@ public class MemberService {
     }
 
 
-    public void mailKeyAuth(Long id, String mailKey) {
-        Member findMember= checkMemberExist(id);
-        if (findMember.getMailKey().equals(mailKey)) {
-            findMember.setStatus( MemberStatus.MEMBER_ACTIVE);
-            memberRepository.save(findMember);
-        } else {
-            throw new BusinessLogicException(MemberException.MAILKEY_MISMATCH);
-        }
+
 
 
     }*/
@@ -426,11 +425,11 @@ public class MemberService {
         return findMember;
     }
 
-    public String delegateAccessToken( Member member) {
+    public String delegateAccessToken(Member member) {
         Map<String, Object> claims = new HashMap<>();
         PrincipalDto principal = PrincipalDto.builder().id(member.getMemberId()).email(member.getEmail())
                 .name(member.getName()).build();
-        claims.put("membername", member.getEmail());
+        claims.put("username", member.getEmail());
         claims.put("roles", member.getRoles());
         claims.put("principal", principal);
         log.info("###### principal = {} ", principal);
@@ -448,7 +447,7 @@ public class MemberService {
     }
 
     // (6)
-    public String delegateRefreshToken( Member member) {
+    public String delegateRefreshToken(Member member) {
         String subject = member.getEmail();
         Date expiration = jwtTokenizer.getTokenExpiration(
                 jwtTokenizer.getRefreshTokenExpirationMinutes());

@@ -2,10 +2,12 @@ package com.mainproject.be28.auth.dto;
 
 import lombok.*;
 
+import java.security.Principal;
+
 @Getter
 @Setter
 @ToString
-public class PrincipalDto {
+public class PrincipalDto implements Principal {
 
     private Long id;
     private String email;
@@ -15,5 +17,10 @@ public class PrincipalDto {
         this.id = id;
         this.email = email;
         this.name = name;
+    }
+    @Override
+    public String getName() {
+
+        return this.email;
     }
 }

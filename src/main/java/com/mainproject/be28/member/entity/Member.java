@@ -21,6 +21,7 @@ import lombok.Builder.Default;
 @Entity
 @Getter
 @Builder
+@Table
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 public class Member extends Auditable {
@@ -42,8 +43,7 @@ public class Member extends Auditable {
 
     @Column(unique = true)
     @Setter
-    @Default
-    private String phoneNumber = "";
+    private String phoneNumber;
 
     @Setter
     @Embedded

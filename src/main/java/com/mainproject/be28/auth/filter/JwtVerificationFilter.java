@@ -1,10 +1,10 @@
 package com.mainproject.be28.auth.filter;
 
+import com.mainproject.be28.auth.details.CustomMemberDetailsService;
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,11 +21,22 @@ import java.util.Map;
 public class JwtVerificationFilter extends OncePerRequestFilter {
     private final JwtTokenizer jwtTokenizer;
     private final CustomAuthorityUtils authorityUtils;
+    private final CustomMemberDetailsService customMemberDetailsService;
+
 
     public JwtVerificationFilter(JwtTokenizer jwtTokenizer,
-                                 CustomAuthorityUtils authorityUtils) {
+                                 CustomAuthorityUtils authorityUtils, CustomMemberDetailsService customMemberDetailsService) {
         this.jwtTokenizer = jwtTokenizer;
         this.authorityUtils = authorityUtils;
+        this.customMemberDetailsService = customMemberDetailsService;
+    }
+    private void setAuthenticationToContext(Map<String, Object> claims) {
+        String username = (String) claims.get("username");   // (4-1)
+        List<GrantedAuthority> authorities = authorityUtils.createAuthorities(
+                (List) claims.get("roles"));  // (4-2)
+        Authentication authentication = new UsernamePasswordAuthenticationToken
+                (customMemberDetailsService.loadUserByUsername(username), null, authorities);  // (4-3)
+        SecurityContextHolder.getContext().setAuthentication(authentication); // (4-4)
     }
 
     @Override
@@ -53,20 +64,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         return authorization == null || !authorization.startsWith("Bearer");
     }
 
-
-    // request 객체로 claims 객체 꺼내는 메서드
-
     private Map<String, Object> verifyJws(HttpServletRequest request) {
         String jws = request.getHeader("Authorization").replace("Bearer ", "");
-        Map<String, Object> claims = jwtTokenizer.getClaims(jws).getBody();
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+        Map<String, Object> claims = jwtTokenizer.getClaims(jws, base64EncodedSecretKey).getBody();
 
         return claims;
     }
 
-    private void setAuthenticationToContext(Map<String, Object> claims) {
-        String username = (String) claims.get("username");
-        List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List)claims.get("roles"));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
+
+
 }

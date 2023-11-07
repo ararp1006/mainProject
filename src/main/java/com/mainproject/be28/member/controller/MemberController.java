@@ -1,19 +1,22 @@
 package com.mainproject.be28.member.controller;
 
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
+import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.image.entity.ImageInfo;
 import com.mainproject.be28.member.dto.AuthLoginDto;
 import com.mainproject.be28.member.dto.MemberDto;
 import com.mainproject.be28.member.dto.PasswordPatchDto;
-import com.mainproject.be28.member.dto.Recovery;
+import com.mainproject.be28.member.excption.MemberException;
 import com.mainproject.be28.member.mapper.MemberMapper;
 import com.mainproject.be28.member.service.MailService;
 import com.mainproject.be28.member.service.MemberService;
 import com.mainproject.be28.utils.UriCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.mainproject.be28.member.entity.Member;
@@ -135,6 +138,7 @@ public class MemberController {
                                      Principal principal) {
 
         log.info("##### UPDATE USER #####");
+        System.out.println(principal.getName());
         Member member = mapper.memberPatchDtoToMember(patchDto);
         member.setEmail(principal.getName());
         Member patchedMember = memberService.updatedMember(member);
@@ -143,9 +147,13 @@ public class MemberController {
     }
 
     //회원 상세 정보 조회
+    //회원 상세 정보 조회
     @GetMapping
     public ResponseEntity getUser(Principal principal) {
-        log.info("##### GET MEMBER #####");
+        log.info("##### GET USER #####");
+        log.debug("principal: {}", principal);
+
+
         Member findMember = memberService.checkMemberExist(principal.getName());
         MemberDto.ResponseDto memberResponseDto = mapper.memberToMemberResponseDto(findMember);
 
@@ -157,7 +165,6 @@ public class MemberController {
         }
         return ResponseEntity.ok(memberResponseDto);
     }
-
     // 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity updatePassword(Principal principal,
@@ -183,7 +190,7 @@ public class MemberController {
     //이미지 업로드
     @PostMapping("/image")
     public ResponseEntity postUserImage(Principal principal,
-                                        @RequestBody MultipartFile file) {
+                                        @RequestPart("file") MultipartFile file) {
         Member findMember = memberService.checkMemberExist(principal.getName());
         memberService.postMemberImage(findMember.getMemberId(), file);
         return new ResponseEntity(HttpStatus.CREATED);
@@ -201,18 +208,22 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.CREATED);
 
     }
-
-
-  /*  // 이메일키 인증
+    // 이메일키 인증
     @GetMapping("/email_auth")
-    public void getEmailAuth(@RequestParam("id") @Positive Long id,
-                             @RequestParam("mailKey") String mailKey,
-                             HttpServletResponse response) throws IOException {
-
-        memberService.mailKeyAuth(id, mailKey);
-        String redirectUri = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com/email/complete";
-        response.sendRedirect(redirectUri);
+    public ResponseEntity<String> confirmRegistration(@RequestParam("id") Long id, @RequestParam("mailKey") String mailKey) {
+        try {
+            memberService.mailKeyAuth(id, mailKey);
+            // 인증 성공
+            return ResponseEntity.ok("이메일 인증이 완료되었습니다. 로그인을 진행해 주세요.");
+        } catch (BusinessLogicException e) {
+            // 인증 실패
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 인증 접근입니다.");
+        }
     }
+
+
+
+  /*
 
     // 리커버리 이메일 샌드
     @PostMapping("/recovery/signup/send")

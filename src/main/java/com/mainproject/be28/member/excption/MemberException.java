@@ -16,6 +16,8 @@ public enum MemberException  implements ExceptionCode {
     NOT_ACTIVE_MEMBER(HttpStatus.FORBIDDEN, "This MEMBER Is Not Active"),
     NOT_GOOGLE_MEMBER(HttpStatus.CONFLICT, "Not Google MEMBER"),
     NO_PERMISSION_EDITING_POST(HttpStatus.FORBIDDEN, "This MEMBER Is Not Active"),
+    NO_AUTHENTICATE_MEMEBER(HttpStatus.FORBIDDEN, "인증정보가 없습니다."),
+    NO_PRINCIPAL_MEMEBER(HttpStatus.FORBIDDEN, "멤버인증정보가 없습니다.."),
     GOOGLE_MEMBER(HttpStatus.NOT_FOUND, "Google MEMBER");
 
     private final HttpStatus status;

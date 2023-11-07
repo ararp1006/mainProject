@@ -1,49 +1,44 @@
 package com.mainproject.be28.auth.config;
 
 
+import com.mainproject.be28.auth.details.CustomMemberDetailsService;
 import com.mainproject.be28.auth.filter.JwtAuthenticationFilter;
 import com.mainproject.be28.auth.filter.JwtVerificationFilter;
 import com.mainproject.be28.auth.handler.*;
 import com.mainproject.be28.auth.jwt.JwtTokenizer;
-import com.mainproject.be28.auth.refresh.RefreshTokenRepository;
 import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
-import com.mainproject.be28.member.repository.MemberRepository;
-import com.mainproject.be28.member.service.MemberService;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
-@RequiredArgsConstructor
+
 public class SecurityConfiguration {
     private final JwtTokenizer jwtTokenizer;
     private final CustomAuthorityUtils authorityUtils;
-    private final MemberService memberService;
+    private final CustomMemberDetailsService customMemberDetailsService;
 
-    private final MemberRepository memberRepository;
+    public SecurityConfiguration(JwtTokenizer jwtTokenizer, CustomAuthorityUtils authorityUtils, CustomMemberDetailsService customMemberDetailsService) {
+        this.jwtTokenizer = jwtTokenizer;
+        this.authorityUtils = authorityUtils;
+        this.customMemberDetailsService = customMemberDetailsService;
+    }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -64,7 +59,10 @@ public class SecurityConfiguration {
                 .apply(new CustomFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .antMatchers("/h2/**").permitAll() // Permit all accesses to H2 database console
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permit all preflight requests
+                        .antMatchers(HttpMethod.GET, "/*/members").hasRole("USER")     // (3) 추가
+
                 );
                // .oauth2Login(oauth2 -> oauth2
                  //       .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, memberService))
@@ -90,13 +88,24 @@ public class SecurityConfiguration {
         return source;
     }
 
-    // 추가
-    public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer, HttpSecurity> {
-        @Override
-        public void configure(HttpSecurity builder) throws Exception {
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils);
 
-            builder.addFilterAfter(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class); // (1)
+        public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer, HttpSecurity> {
+            @Override
+            public void configure(HttpSecurity builder) throws Exception {
+                AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+
+                JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);
+                jwtAuthenticationFilter.setFilterProcessesUrl("/login");
+                jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());//성공핸들러
+                jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());//실패핸들러
+
+                JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, customMemberDetailsService);
+
+
+                builder
+                        .addFilter(jwtAuthenticationFilter)
+                        .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
+            }
         }
     }
-}
+
