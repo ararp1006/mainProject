@@ -1,6 +1,8 @@
 package com.mainproject.be28.order.service;
 
 
+import com.mainproject.be28.cart.dto.CartItemDto;
+import com.mainproject.be28.cart.entity.CartItem;
 import com.mainproject.be28.cart.exception.CartException;
 import com.mainproject.be28.cart.repository.CartItemRepository;
 import com.mainproject.be28.exception.BusinessLogicException;
@@ -10,15 +12,16 @@ import com.mainproject.be28.item.service.ItemService;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.member.repository.MemberRepository;
 import com.mainproject.be28.member.service.MemberService;
+import com.mainproject.be28.order.data.OrderData;
 import com.mainproject.be28.order.data.OrderStatus;
 import com.mainproject.be28.order.dto.OrderPatchStatusDto;
 import com.mainproject.be28.order.dto.OrderPostDto;
 import com.mainproject.be28.order.entity.Order;
 import com.mainproject.be28.order.exception.OrderException;
 import com.mainproject.be28.order.repository.OrderRepository;
-import com.mainproject.be28.orderItem.dto.OrderItemPostDto;
-import com.mainproject.be28.orderItem.entity.OrderItem;
-import com.mainproject.be28.orderItem.repository.OrderItemRepository;
+import com.mainproject.be28.order.dto.OrderItemPostDto;
+import com.mainproject.be28.order.entity.OrderItem;
+import com.mainproject.be28.order.repository.OrderItemRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,39 +43,31 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
 
-    //주문생성
-    public Order createOrder(Order order, OrderPostDto orderPostDto, long memberId) throws IOException /*IamportResponseException,*/  {
-        validation(order, orderPostDto);
-        Order orderBuilder = Order.builder()
-                .member(memberService.findVerifiedMember(memberId)).build();
+   //주문생성
+    public Order createOrder(OrderPostDto orderPostDto, Long memberId) throws IOException {
+        Order order = new Order();
         order.makeOrderNumber();
+        Member member = memberService.getMember(memberId);
+        memberService.checkActive(member);
+        order.addMember(member);
+        // 주문 아이템 처리
+        cartItemPostDtoToOrdersItem(orderPostDto.getCartItems(), order);
 
-        orderRepository.save(order);
-        // paymentService.postPrepare(order.getOrderNumber(), order.getTotalPrice());
-        return order;
+        // 주문 정보 설정 (주문 번호, 주문 총액, 주문 상태, 주소, 등등...)
+
+
+        // 주문을 저장
+        return orderRepository.save(order);
     }
 
-    private void validation(Order order, OrderPostDto orderPostDto) {
-        if (orderPostDto != null && orderPostDto.getOrderItems() != null) {
-            OrderItemPostDtoToOrdersItem(orderPostDto.getOrderItems(), order);
-        }
-        else {
-            Optional<List<OrderItemPostDto>> orderItemsOptional = Optional.ofNullable(orderPostDto.getOrderItems());
-            if (!orderItemsOptional.isPresent()) {
-                throw new BusinessLogicException(OrderException.ORDER_ITME_NO_FOUND );
-            }
-            // 주문 아이템이나 주문 정보가 유효하지 않은 경우 예외 처리 또는 기본 로직 추가
-            throw new BusinessLogicException(OrderException.INVALID_ORDER_DATA);
-        }
-    }
 
-    //// ItemId 와 quantity, member로 OrdersItem를 저장
-    private void OrderItemPostDtoToOrdersItem(List<OrderItemPostDto> orderItemPostDtos, Order order) {
-        List<OrderItem> orderItems = new ArrayList<>(); //orderItems 빈 리스트 생성
+    ////카트아이템을 오더아이템으로 바꿈
+    private void cartItemPostDtoToOrdersItem(List<CartItemDto> cartItemDtos, Order order) {
+        List<OrderItem> orderItems = new ArrayList<>(); // cartItems 빈 리스트 생성
 
-        orderItemPostDtos.stream().forEach(orderItemPostDto -> { //orderItems 리스트에 추가
-            Item item = itemService.findItem(orderItemPostDto.getItemId());
-            long quantity = orderItemPostDto.getQuantity();
+        cartItemDtos.forEach(cartItemDto -> {
+            Item item = itemService.findItem(cartItemDto.getItems().get(0).getItemId());
+            long quantity = cartItemDto.getItems().get(1).getQuantity();
 
             OrderItem orderItem = new OrderItem(quantity, item);
             orderItem.addOrder(order);
@@ -82,14 +77,15 @@ public class OrderService {
             orderItems.add(orderItem);
         });
 
-        // 모든 주문 항목을 주문에 추가한 후에 한 번만 총액을 계산하고 설정합니다.
+
         order.getOrderItems().addAll(orderItems);
         long totalPrice = getTotalPrice(orderItems);
         order.setTotalPrice(totalPrice);
 
-        // 저장
+        // 주문 아이템 저장
         orderItemRepository.saveAll(orderItems);
     }
+
 
     //총합 가격
     public long getTotalPrice(List<OrderItem> orderItems) {

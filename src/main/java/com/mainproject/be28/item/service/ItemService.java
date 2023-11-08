@@ -101,15 +101,7 @@ public class ItemService {
         return score;
     }
 
-    private List<ItemImage> saveImage(Item item, List<MultipartFile> itemImgFileList) throws IOException {
-        List<ItemImage> images = new ArrayList<>();
-        for (int i = 0; i < itemImgFileList.size(); i++) {
-            MultipartFile file = itemImgFileList.get(i);
-            ItemImage image = imageService.uploadItemImage(file, item);
-            images.add(image);
-        }
-        return images;
-    }
+
 
     public Page<Item> searchItems(String search, int page, int size, String sort,
                                         Sort.Direction direction){

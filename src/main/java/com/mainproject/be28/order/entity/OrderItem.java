@@ -1,4 +1,4 @@
-package com.mainproject.be28.orderItem.entity;
+package com.mainproject.be28.order.entity;
 
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.order.entity.Order;

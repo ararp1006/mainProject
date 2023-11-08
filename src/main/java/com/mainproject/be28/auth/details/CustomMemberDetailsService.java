@@ -32,6 +32,11 @@ public class CustomMemberDetailsService implements UserDetailsService {
         Optional<Member> optionalMember = memberRepository.findByEmail(username);
         Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
 
+        // 멤버 상태가 MEMBER_TMP이면 BusinessLogicException을 발생시켜 로그인을 막습니다.
+        if (findMember.getStatus() == MemberStatus.MEMBER_TMP) {
+            throw new BusinessLogicException(MemberException.NOT_YET_AUTHENTICATE_EMAIL);
+        }
+
         return new PrincipalDetails(findMember,authorityUtils);
     }
 }

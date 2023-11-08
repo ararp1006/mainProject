@@ -2,6 +2,10 @@ package com.mainproject.be28.review.service;
 
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
+import com.mainproject.be28.image.entity.ItemImage;
+import com.mainproject.be28.image.entity.ReviewImage;
+import com.mainproject.be28.image.service.ImageService;
+import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.review.entity.Review;
 import com.mainproject.be28.review.exception.ReviewException;
 import com.mainproject.be28.review.repository.ReviewRepository;
@@ -9,7 +13,11 @@ import com.mainproject.be28.utils.CustomBeanUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +28,8 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final CustomBeanUtils<Review> beanUtils;
+    private final ImageService imageService;
+
 
     //리뷰 생성
     public  Review createReview(Review review){
@@ -62,6 +72,24 @@ public class ReviewService {
             return reviewRepository.save(review);
         }
         return null;
+    }
+
+    //리뷰 이미지 올리기
+    public void uploadImages(Long reviewId, List<MultipartFile> files) {
+        Review review= findReview(reviewId);
+        if (review != null) {
+            List<ReviewImage> uploadedImages = new ArrayList<>();
+            for (MultipartFile file : files) {
+                ReviewImage image = imageService.uploadReviewImage(file, review);
+                if (image != null) {
+                    uploadedImages.add(image);
+                }
+            }
+            if (!uploadedImages.isEmpty()) {
+                review.setReviewImage(uploadedImages);
+                reviewRepository.save(review);
+            }
+        }
     }
 }
 

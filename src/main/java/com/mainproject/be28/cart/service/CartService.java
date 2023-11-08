@@ -1,6 +1,5 @@
 package com.mainproject.be28.cart.service;
 
-import com.mainproject.be28.cart.dto.CartItemDto;
 import com.mainproject.be28.cart.entity.Cart;
 import com.mainproject.be28.cart.exception.CartException;
 import com.mainproject.be28.cart.repository.CartRepository;
@@ -8,20 +7,17 @@ import com.mainproject.be28.cart.entity.CartItem;
 import com.mainproject.be28.cart.repository.CartItemRepository;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.item.entity.Item;
-import com.mainproject.be28.item.exception.ItemException;
 import com.mainproject.be28.item.service.ItemService;
 import com.mainproject.be28.member.service.MemberService;
 import com.mainproject.be28.order.dto.CartOrderDto;
 import com.mainproject.be28.order.entity.Order;
 import com.mainproject.be28.order.service.OrderService;
-import com.mainproject.be28.orderItem.dto.OrderItemPostDto;
+import com.mainproject.be28.order.dto.OrderItemPostDto;
 import com.mainproject.be28.utils.CustomBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,6 +83,10 @@ public class CartService {
         return null;
     }
 
+    public void refreshTotalPrice(Cart cart) {
+        cart.calculateTotalPrice();
+        cartRepository.save(cart);
+    }
 
     public void deleteCart(long cartItemId) { // 장바구니 내 개별 상품 제거
         CartItem cartItem = cartItemRepository.findByCartItemId(cartItemId);

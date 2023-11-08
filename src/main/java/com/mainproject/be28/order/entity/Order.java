@@ -3,7 +3,7 @@ package com.mainproject.be28.order.entity;
 import com.mainproject.be28.auditable.Auditable;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.order.data.OrderStatus;
-import com.mainproject.be28.orderItem.entity.OrderItem;
+import com.mainproject.be28.order.entity.OrderItem;
 import com.mainproject.be28.payment.entity.PayInfo;
 import lombok.*;
 
@@ -28,25 +28,37 @@ public class Order extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
+
     @Column(nullable = false, unique = true)
     private String orderNumber; // 주문 번호
-    private Long totalPrice; // 주문 총액
-   private OrderStatus status = OrderStatus.NOT_PAID; // 주문 상태
 
+    private Long totalPrice; // 주문 총액
+
+    private OrderStatus status = OrderStatus.NOT_PAID; // 주문 상태
+
+    private String addressee; // 받는 사람
+
+    private String zipCode; // 배송 우편번호
+
+    private String simpleAddress; // 배송 주소
+
+    private String detailAddress; // 배송 상세주소
+
+    private String phoneNumber; // 수령인 전화번호
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Member_ID")
     private Member member;
 
-    public void addMember(Member member) {
-        this.member = member;
-        if (!member.getOrder().contains(this)) {
-            member.addOrder(this);
-        }
-    }
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order")
+    private PayInfo payInfo;
+
+
+
+
 
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
@@ -54,14 +66,16 @@ public class Order extends Auditable {
             orderItem.setOrder(this);
         }
     }
-
-    @OneToOne(mappedBy = "order")
-    private PayInfo payInfo;
-
     public void addPayInfo(PayInfo payInfo) {
         this.payInfo = payInfo;
         if(payInfo.getOrder() != this) {
             payInfo.addOrder(this);
+        }
+    }
+    public void addMember(Member member) {
+        this.member = member;
+        if (!member.getOrder().contains(this)) {
+            member.addOrder(this);
         }
     }
     //환불

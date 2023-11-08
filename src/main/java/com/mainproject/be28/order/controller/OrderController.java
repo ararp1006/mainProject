@@ -1,22 +1,28 @@
 package com.mainproject.be28.order.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 
+import com.mainproject.be28.auth.details.PrincipalDetails;
+import com.mainproject.be28.auth.utils.UriCreator;
 import com.mainproject.be28.order.dto.OrderPageResponseDto;
 import com.mainproject.be28.order.dto.OrderPostDto;
 import com.mainproject.be28.order.dto.OrderResponseDto;
 import com.mainproject.be28.order.entity.Order;
 import com.mainproject.be28.order.mapper.OrderMapper;
 import com.mainproject.be28.order.service.OrderService;
+import com.siot.IamportRestClient.exception.IamportResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @Validated
@@ -27,15 +33,23 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderMapper mapper;
 
-    @PostMapping("/{memberId}")//주문생성(아이템아이디,개수)
-    public ResponseEntity<?> postOrder(@Valid @RequestBody OrderPostDto orderPostDto,
-                                       @PathVariable("memberId") long memberId) throws IOException {
+    @PostMapping
+    public ResponseEntity<?> createOrderAndProceedToPayment(
+            @Valid @RequestBody OrderPostDto orderPostDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            UriComponentsBuilder uriComponentsBuilder) throws IOException {
 
-        Order order = new Order();
-        Order createdOrder = orderService.createOrder(order, orderPostDto, memberId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Long memberId = principalDetails.getMemberId();
+        Order order = orderService.createOrder(orderPostDto, memberId);
 
+        // 주문이 생성되었으므로 해당 주문으로 결제 페이지로 이동하는 URI를 생성합니다.
+        URI paymentUri = uriComponentsBuilder.path("/payment/{orderNumber}")
+                .buildAndExpand(order.getOrderNumber()).toUri();
+
+        // 결제 페이지로 이동하는 URI와 함께 Created(201) 상태로 응답합니다.
+        return ResponseEntity.created(paymentUri).build();
     }
+
 
     @GetMapping("/checkout/{order-id}")//특정 주문을 찾고, 해당 주문이 현재 사용자인지 확인
     public ResponseEntity<?> getOrderToPay(@PathVariable("order-id") @PositiveOrZero long orderId,

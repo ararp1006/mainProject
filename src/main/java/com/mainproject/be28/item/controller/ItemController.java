@@ -71,6 +71,7 @@ public class ItemController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    //관리자가 이미지 업로드
     @PostMapping("/admin/items/{itemId}/image")
     public ResponseEntity postItemImage(@ApiParam(value = "File to upload", required = true) @PathVariable("itemId") @Positive Long itemId,
                                            @RequestPart("file") List<MultipartFile> files
@@ -80,6 +81,7 @@ public class ItemController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
+    //아이템 찾기
     @GetMapping("/{itemId}")
     public ResponseEntity getItem(@PathVariable("itemId") @Positive long itemId){
 

@@ -1,4 +1,4 @@
-package com.mainproject.be28.orderItem.dto;
+package com.mainproject.be28.order.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

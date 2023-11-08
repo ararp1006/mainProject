@@ -1,4 +1,4 @@
-package com.mainproject.be28.orderItem.dto;
+package com.mainproject.be28.order.dto;
 
 import com.sun.istack.NotNull;
 import lombok.Getter;

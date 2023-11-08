@@ -147,7 +147,6 @@ public class MemberController {
     }
 
     //회원 상세 정보 조회
-    //회원 상세 정보 조회
     @GetMapping
     public ResponseEntity getUser(Principal principal) {
         log.info("##### GET USER #####");

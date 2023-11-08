@@ -4,11 +4,13 @@ import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.image.entity.ImageInfo;
 import com.mainproject.be28.image.entity.ItemImage;
 import com.mainproject.be28.image.entity.MemberImage;
+import com.mainproject.be28.image.entity.ReviewImage;
 import com.mainproject.be28.image.exception.ImageUploadException;
 import com.mainproject.be28.image.repository.ItemImageRepository;
 import com.mainproject.be28.image.util.ImageSort;
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.member.entity.Member;
+import com.mainproject.be28.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +55,19 @@ public class ImageService {
                 .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
                 .build();
     }
+    public ReviewImage uploadReviewImage(MultipartFile mf, Review review){
+        long time = System.currentTimeMillis();
+        String originalFilename = mf.getOriginalFilename();
+        String saveFileName = String.format("%d_%s", time, originalFilename.replaceAll(" ", ""));
+        String filePath = ImageSort.Review_IMAGE.getPath();
 
+        String savedPath = createAndUploadFile(mf,saveFileName, filePath);
+        log.info("Saved Path : "+savedPath);
+
+        return  ReviewImage.builder().review(review)
+                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
+                .build();
+    }
 
     // 임시 파일 생성 & 업데이트 & 임시 파일 삭제
     private  String createAndUploadFile(MultipartFile mf, String saveFileName, String filePath) {

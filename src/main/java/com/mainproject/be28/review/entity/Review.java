@@ -1,6 +1,8 @@
 package com.mainproject.be28.review.entity;
 
 import com.mainproject.be28.auditable.Auditable;
+import com.mainproject.be28.image.entity.ItemImage;
+import com.mainproject.be28.image.entity.ReviewImage;
 import com.mainproject.be28.item.entity.Item;
 import com.mainproject.be28.member.entity.Member;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,13 +28,7 @@ public class Review extends Auditable {
     @Column()
     private Long reviewId;
 
-    @ManyToOne
-    @JoinColumn(name = "ITEM_ID", nullable = false)
-    private Item item;
 
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_ID", nullable = false)
-    private Member member;
 
     @Column(length = 1000)
     private String content;
@@ -41,7 +39,17 @@ public class Review extends Auditable {
     @Column
     private Long unlikeCount=0L;
 
-    @Column()
+    @Column
     private int Score;
+    @ManyToOne
+    @JoinColumn(name = "ITEM_ID", nullable = false)
+    private Item item;
+
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID", nullable = false)
+    private Member member;
+
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<ReviewImage> reviewImage = new ArrayList<>();
 
 }

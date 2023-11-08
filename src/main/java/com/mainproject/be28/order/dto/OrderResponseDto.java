@@ -1,7 +1,6 @@
 package com.mainproject.be28.order.dto;
 
 
-import com.mainproject.be28.orderItem.dto.OrderItemResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
