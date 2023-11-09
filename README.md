@@ -1,5 +1,4 @@
 # [프로젝트 소개]
-- **`팀 명` :** 성환공주와 여섯난장이
 - **`프로젝트 명` :** 개발자만을 위한! 놀이터
 - **`프로젝트 설명` :** 개발자들을 위한 꿀템을 판매하는 쇼핑몰
 - **`팀원` :** 최성환(팀장), 강소이, 이수현, 박아름(부팀장), 홍지원, 우다연, 이호연
@@ -13,13 +12,6 @@
 | Github | Discord | Notion |
 | :---: | :---: |:---:|
 | <img alt="github logo" src="https://techstack-generator.vercel.app/github-icon.svg" width="65" height="65"> | <img alt="Discord logo" src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/62595384e89d1d54d704ece7_3437c10597c1526c3dbd98c737c2bcae.svg" height="65" width="65"> |<img alt="Notion logo" src="https://www.notion.so/cdn-cgi/image/format=auto,width=640,quality=100/front-static/shared/icons/notion-app-icon-3d.png" height="65" width="65">|
-
-<br />
-
-### <span> 🖥 **Front-end** </span>
-| Html | CSS | TypeScript | React | Redux Toolkit | Axios | AWS |
-| :---: | :---: | :---: | :---: | :---: | :---: |  :---: |
-| <img alt="Html" src ="https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg" width="65" height="65" /> | <div style="display: flex; align-items: flex-start;"><img src="https://user-images.githubusercontent.com/111227745/210204643-4c3d065c-59ec-481d-ac13-cea795730835.png" alt="CSS" width="50" height="65" /></div> | <div style="display: flex; align-items: flex-start;"><img src="https://techstack-generator.vercel.app/ts-icon.svg" alt="icon" width="85" height="85" /></div> | <div style="display: flex; align-items: flex-start;"><img src="https://techstack-generator.vercel.app/react-icon.svg" alt="icon" width="65" height="65" /></div> | <div style="display: flex; align-items: flex-start;"><img src="https://techstack-generator.vercel.app/redux-icon.svg" alt="styled-components icon" width="65" height="65" /></div> | <div style="display: flex; align-items: flex-start;"><img src="https://github.com/codestates-seb/seb45_main_024/assets/85465266/b1f50001-7fb6-4517-88a2-2399e96f4f21" alt="icon" width="65" height="65" /></div> | <div style="display: flex; align-items: flex-start;"><img src="https://techstack-generator.vercel.app/aws-icon.svg" alt="icon" width="65" height="65" /></div> |
 
 <br />
 
@@ -38,3 +30,4 @@
 
 ### 4) 배포된 화면
 <img width="1726" alt="스크린샷 2023-09-21 오후 8 17 43" src="https://github.com/ararp1006/seb45_main_028/assets/130068083/04106ad0-3eab-4e36-ba9a-6ca8d3e06edd">
+
