@@ -22,12 +22,7 @@
 
 <br />
 
-### 2) ERD
-<img width="832" alt="스크린샷 2023-09-19 오후 7 11 10" src="https://github.com/ararp1006/seb45_main_028/assets/130068083/a1400f52-5b3d-4eba-8e55-e666e6e06bf4">
+### 2) 상세설명
+"https://www.notion.so/ararp1006/69ca78f378c84d4fb31aedd538914112)https://www.notion.so/ararp1006/69ca78f378c84d4fb31aedd538914112"
 
-### 3) API 명세서
-<img width="793" alt="스크린샷 2023-09-21 오후 7 56 53" src="https://github.com/ararp1006/seb45_main_028/assets/130068083/b94c4186-a412-4e7e-907a-2931789afed8">
-
-### 4) 배포된 화면
-<img width="1726" alt="스크린샷 2023-09-21 오후 8 17 43" src="https://github.com/ararp1006/seb45_main_028/assets/130068083/04106ad0-3eab-4e36-ba9a-6ca8d3e06edd">
 
