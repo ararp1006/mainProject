@@ -23,6 +23,5 @@
 <br />
 
 ### 2) 상세설명
-"https://www.notion.so/ararp1006/69ca78f378c84d4fb31aedd538914112)https://www.notion.so/ararp1006/69ca78f378c84d4fb31aedd538914112"
 
 
