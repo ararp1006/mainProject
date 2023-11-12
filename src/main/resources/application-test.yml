@@ -7,7 +7,7 @@ spring:
       region.static: ap-northeast-2
       stack.auto: false
   jwt:
-    key: yourSecretKey123r345swergsdfg
+    key: yourSecretKey123r345swergsdfg23466
     access-token-expiration-minutes: 40
     refresh-token-expiration-minutes: 420
   mvc:
