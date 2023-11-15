@@ -22,6 +22,7 @@ import lombok.Builder.Default;
 @Getter
 @Builder
 @Table
+@Setter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 public class Member extends Auditable {

@@ -19,6 +19,7 @@ public class MemberDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Setter
+    @Builder
     public static class PostDto{
         @NotNull
         @Email

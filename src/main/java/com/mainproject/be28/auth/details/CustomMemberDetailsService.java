@@ -15,6 +15,7 @@ import java.util.Optional;
 
 
 @Component
+
 public class CustomMemberDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
