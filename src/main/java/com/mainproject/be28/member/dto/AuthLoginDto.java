@@ -1,6 +1,5 @@
 package com.mainproject.be28.member.dto;
 
-import com.mainproject.be28.image.entity.MemberImage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

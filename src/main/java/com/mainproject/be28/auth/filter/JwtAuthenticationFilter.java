@@ -75,7 +75,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Map<String, Object> claims = new HashMap<>();
         PrincipalDto principal = PrincipalDto.builder().id(member.getMemberId()).email(member.getEmail())
                 .name(member.getName()).build();
-        claims.put("membername", member.getEmail());
         claims.put("username", member.getEmail());
         claims.put("roles", member.getRoles());
         claims.put("principal", principal);

@@ -130,59 +130,7 @@ public class MemberService {
         return findMember;
     }
 
-  /*  // 메일 인증을 통한 리커버리
-    public  Member recovery(String email, String mailKey, String afterPassword) {
-        //회원이 존재하는지 검증
-        Member findMember = checkMemberExist(email);
-        //메일 키가 일치하는지 검증
-        if (findMember.getMailKey().equals(mailKey)) {
-            findMember.setPassword(passwordEncoder.encode(afterPassword));
-            memberRepository.save(findMember);
-        } else {
-            throw new BusinessLogicException(MemberException.MAILKEY_MISMATCH);
-        }
 
-        return findMember;
-    }*/
-
-
-  /*  // recovery email send
-    @Async
-    public void recoveryEmailSend(String emailSignUp, String emailNeedToSend)
-            throws MessagingException, UnsupportedEncodingException {
-        String newMailKey = createCode();
-        Member findMember = memberRepository.findByEmail(emailSignUp).get();
-        if (emailSignUp.equals(emailNeedToSend)) {
-            findMember.setMailKey(newMailKey);
-            memberRepository.save(findMember);
-            sendEmailRecovery(emailSignUp, newMailKey);
-        } else {
-            sendEmailDismatch(emailNeedToSend);
-        }
-
-    }
-
-    // recovery PW email send
-    @Async
-    public Member recoveryPWEmailSend(String email)
-            throws MessagingException, UnsupportedEncodingException {
-        log.info("recoveryPWEmailSend");
-        String newMailKey = createCode();
-        Member findmember = memberRepository.findByEmail(email).orElse(null);
-        if (findmember != null && findmember.getStatus().equals(MemberStatus.MEMBER_GOOGLE)) {
-            simpleEmailSend(email);
-
-        } else if (findmember != null) {
-            findmember.setMailKey(newMailKey);
-            memberRepository.save(findmember);
-            sendEmailRecovery(email, newMailKey);
-        } else {
-            sendEmailNoExist(email);
-        }
-        return findmember;
-
-    }
-*/
     public  Member getMember(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessLogicException( MemberException.MEMBER_NOT_FOUND));
@@ -206,7 +154,8 @@ public class MemberService {
 
     // 회원이 존재하지 않으면 예외발생 by email
     public  Member checkMemberExist(String email) {
-        return memberRepository.findMemberByEmail(email)
+
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessLogicException(MemberException.MEMBER_NOT_FOUND));
     }
 
@@ -258,127 +207,6 @@ public class MemberService {
     }
 
 
-/*
-
-    //메일 양식 작성
-    public MimeMessage createEmailFormRecovery(String email, String mailKey)
-            throws MessagingException, UnsupportedEncodingException {
-
-        String setFrom = "${spring.mail.membername}"; //email-config에 설정한 자신의 이메일 주소(보내는 사람)
-        String toEmail = email; //받는 사람
-        String title = "개발자들계정 복구 서비스입니다."; //제목
-        String href =
-                "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com/email/send/password?email="
-                        + email + "&mailKey=" + mailKey;
-
-        MimeMessage message = mailSender.createMimeMessage();
-        message.addRecipients(MimeMessage.RecipientType.TO, email); //보낼 이메일 설정
-        message.setSubject(title); //제목 설정
-        message.setFrom(setFrom); //보내는 이메일
-        message.setText(setContextRecovery(href), "utf-8", "html");
-
-        return message;
-    }
-
-    public MimeMessage createEmailFormDismatch(String email)
-            throws MessagingException, UnsupportedEncodingException {
-
-        String setFrom = "${spring.mail.membername}"; //email-config에 설정한 자신의 이메일 주소(보내는 사람)
-        String toEmail = email; //받는 사람
-        String title = "개발자들 계정 복구 서비스입니다."; //제목
-        String href = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com";
-
-        MimeMessage message = mailSender.createMimeMessage();
-        message.addRecipients(MimeMessage.RecipientType.TO, email); //보낼 이메일 설정
-        message.setSubject(title); //제목 설정
-        message.setFrom(setFrom); //보내는 이메일
-        message.setText(setContextDismatch(href), "utf-8", "html");
-
-        return message;
-    }
-
-    public MimeMessage createEmailFormNoExist(String email)
-            throws MessagingException, UnsupportedEncodingException {
-
-        String setFrom = "${spring.mail.membername}"; //email-config에 설정한 자신의 이메일 주소(보내는 사람)
-        String toEmail = email; //받는 사람
-        String title = "개발자들 계정 복구 서비스입니다."; //제목
-        String href = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com";
-
-        MimeMessage message = mailSender.createMimeMessage();
-        message.addRecipients(MimeMessage.RecipientType.TO, email); //보낼 이메일 설정
-        message.setSubject(title); //제목 설정
-        message.setFrom(setFrom); //보내는 이메일
-        message.setText(setContextNoExist(href), "utf-8", "html");
-
-        return message;
-    }
-
-
-
-    //타임리프를 이용한 context 설정
-    public String setContextRecovery(String href) {
-        Context context = new Context();
-        context.setVariable("href", href);
-        return templateEngine.process("recovery", context); //recovery.html
-
-    }
-
-    //타임리프를 이용한 context 설정
-    public String setContextDismatch(String href) {
-        Context context = new Context();
-        context.setVariable("href", href);
-        return templateEngine.process("dismatch", context); //dismatch.html
-
-    }
-
-    public String setContextNoExist(String href) {
-        Context context = new Context();
-        context.setVariable("href", href);
-        return templateEngine.process("noExist", context); //noExist.html
-
-    }
-
-
-
-    public String sendEmailRecovery(String toEmail, String mailKey)
-            throws MessagingException, UnsupportedEncodingException {
-
-        //메일전송에 필요한 정보 설정
-        MimeMessage emailForm = createEmailFormRecovery(toEmail, mailKey);
-        //실제 메일 전송
-        mailSender.send(emailForm);
-
-        return mailKey;
-    }
-
-
-    public void sendEmailDismatch(String toEmail)
-            throws MessagingException, UnsupportedEncodingException {
-
-        //메일전송에 필요한 정보 설정
-        MimeMessage emailForm = createEmailFormDismatch(toEmail);
-        //실제 메일 전송
-        mailSender.send(emailForm);
-
-    }
-
-
-    public void sendEmailNoExist(String toEmail)
-            throws MessagingException, UnsupportedEncodingException {
-
-        //메일전송에 필요한 정보 설정
-        MimeMessage emailForm = createEmailFormNoExist(toEmail);
-        //실제 메일 전송
-        mailSender.send(emailForm);
-
-    }
-
-
-
-
-
-    }*/
 
     public void postMemberImage(Long id, MultipartFile file) {
         Member member =getMember(id);

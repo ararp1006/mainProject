@@ -38,6 +38,7 @@ spring:
 
   logging:
     level:
+      org.springframework: DEBUG
       org.hibernate.sql: DEBUG
       org.hibernate.type.descriptor.sql: DEBUG #show parameter binding
 

@@ -59,10 +59,10 @@ public class SecurityConfiguration {
                 .apply(new CustomFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers("/h2/**").permitAll() // Permit all accesses to H2 database console
-                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permit all preflight requests
-                        .antMatchers(HttpMethod.GET, "/*/members").hasRole("USER")     // (3) 추가
-
+                        .antMatchers("/h2/**").permitAll()
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .antMatchers(HttpMethod.GET, "/*/members").hasRole("USER")
+                        .antMatchers("/members/login").permitAll() // 추가
                 );
                // .oauth2Login(oauth2 -> oauth2
                  //       .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, memberService))
@@ -95,7 +95,7 @@ public class SecurityConfiguration {
                 AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
                 JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);
-                jwtAuthenticationFilter.setFilterProcessesUrl("members/login");
+                jwtAuthenticationFilter.setFilterProcessesUrl("/login");
                 jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());//성공핸들러
                 jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());//실패핸들러
 
