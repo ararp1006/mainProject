@@ -1,0 +1,128 @@
+buildscript { // queryDSL
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.15'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // queryDSL
+    id 'war' // jsp 사용시 필수 요소
+}
+jar{
+    enabled = false
+}
+group = 'com.mainproject'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '11'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.h2database:h2:2.1.214'
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}" // queryDSL
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}" // queryDSL
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    // Logback 의존성 추가
+    implementation 'ch.qos.logback:logback-classic:1.2.6'
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'commons-fileupload:commons-fileupload:1.5'
+
+    // Swagger
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation 'org.jetbrains:annotations:24.0.0'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    annotationProcessor 'com.querydsl:querydsl-apt'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    //JWT 기능을 위한 jjwt 라이브러리
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    runtimeOnly 'mysql:mysql-connector-java'
+    implementation 'mysql:mysql-connector-java:8.0.28'
+
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
+//mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation 'org.springframework.boot:spring-boot-devtools'
+
+    //Iamport
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
+    //jsp
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'javax.servlet:jstl'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // jsp 사용시 필수 요소
+
+}
+allprojects {
+    repositories {
+
+        maven { url 'https://jitpack.io' }
+    }
+}
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {// queryDSL
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets { // queryDSL
+    main.java.srcDir querydslDir
+}
+
+configurations { // queryDSL
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl { // queryDSL
+    options.annotationProcessorPath = configurations.querydsl
+}
+tasks.named('test') {
+    useJUnitPlatform()
+}
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.mainproject.be28.Be28Application'
+    }
+}
