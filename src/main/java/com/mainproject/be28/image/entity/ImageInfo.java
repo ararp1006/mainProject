@@ -22,4 +22,5 @@ public class ImageInfo {
     private String filePath;
     @Transient
     private final String baseUrl = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com";
+
 }

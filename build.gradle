@@ -9,6 +9,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // queryDSL
     id 'war' // jsp 사용시 필수 요소
+
 }
 jar{
     enabled = false
@@ -90,6 +91,7 @@ dependencies {
     //jsp
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
     implementation 'javax.servlet:jstl'
+
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // jsp 사용시 필수 요소
 
 }
