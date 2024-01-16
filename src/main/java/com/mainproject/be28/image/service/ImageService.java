@@ -37,9 +37,14 @@ public class ImageService {
         String savedPath = createAndUploadFile(mf,saveFileName, filePath);
         log.info("Saved Path : "+savedPath);
 
-        return  ItemImage.builder().item(item)
+        ItemImage itemImage = ItemImage.builder()
+                .item(item)
                 .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
                 .build();
+
+        saveImageToDatabase(itemImage);
+
+        return itemImage;
     }
 
     public MemberImage uploadMemberImage (MultipartFile mf, Member member){
@@ -94,5 +99,8 @@ public class ImageService {
                 uploadFile.delete();
             }
         }
+    }
+    private void saveImageToDatabase(ItemImage itemImage) {
+        itemImageRepository.save(itemImage);
     }
 }

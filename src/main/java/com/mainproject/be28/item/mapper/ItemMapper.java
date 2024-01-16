@@ -35,7 +35,7 @@ public interface ItemMapper {
                     .build();
 
             if(item.getItemImage()!=null){
-                ImageInfo imageInfo = item.getItemImage().get(1).getImageInfo();
+                ImageInfo imageInfo = item.getItemImage().get(0).getImageInfo();
                 onlyItemResponseDto.setImagePath(imageInfo.getBaseUrl()+imageInfo.getFilePath()+imageInfo.getImageName());
             }
 

@@ -2,6 +2,24 @@ spring:
   profiles:
     active: test
 
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    view-names: thymeleaf/*
+
+cloud:
+  aws:
+    credentials.access-key: ${S3_ACCESS_KEY}
+    credentials.secret-key: ${S3_SECRET_KEY}
+    s3.bucket: main-test-aream
+    region.static: ap-northeast-2
+    stack.auto: false
 
 # test 프로파일 설정
 test:
@@ -11,7 +29,7 @@ test:
       h2:
         console:
           enabled: true
-          path: /h2 # 경로
+          path: /h2
           settings:
             web-allow-others: true
       datasource:
@@ -21,29 +39,27 @@ test:
         url: jdbc:h2:mem:test
         sql:
           init:
-            schema-locations: classpath*:db/schema.sql #h2 테이블 위치
-            data-locations: classpath*:db/data.sql  #h2 초기 데이터를 넣게 위한 스크립트 위치
+            schema-locations: classpath*:db/schema.sql
+            data-locations: classpath*:db/data.sql
       jpa:
         hibernate:
-          ddl-auto: update    #스키마 직접 생성 (자동생성 X)
-        show-sql: true        # SQL 쿼리 출력
+          ddl-auto: update
+        show-sql: true
         properties:
           hibernate:
-            format_sql: true  # SQL pretty print
+            format_sql: true
             jdbc:
-              time_zone: Asia/Seoul   # 서버 시간 서울로 변경
+              time_zone: Asia/Seoul
       sql:
         init:
-          schema-locations: classpath*:db/schema.sql #h2 테이블 위치
-          data-locations: classpath*:db/data.sql  #h2 초기 데이터를 넣게 위한 스크립트 위치
+          schema-locations: classpath*:db/schema.sql
+          data-locations: classpath*:db/data.sql
 
 jwt:
-  secret-key: yourSecretKey123r345swergsdfg
+  key: yourSecretKey123r345swergsdfg
   access-token-expiration-minutes: 40
   refresh-token-expiration-minutes: 420
-
 
 mail:
   address:
     admin: admin@gmail.com
-

@@ -26,6 +26,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -48,7 +49,7 @@ public class ItemController {
 
     // 관리자가 개별 상품 생성하기
     @PostMapping("/admin/items")
-    public ResponseEntity createOrUpdateAdminItem(
+    public String createOrUpdateAdminItem(
             @PathVariable(value = "itemId", required = false) @Positive Long itemId,
             @RequestPart(value = "file", required = false) List<MultipartFile> files,
             @RequestPart(value = "itemDto") @Valid ItemDto.Post itemDto
@@ -58,10 +59,10 @@ public class ItemController {
         Item savedItem = itemService.createItem(item);
 
         log.info("------uploadItemsImage------");
-        itemService.uploadImages(itemId, files);
+        itemService.uploadImages(savedItem.getItemId(), files);
 
         log.info("------Item Upload------");
-        return new ResponseEntity(savedItem.getItemId(), HttpStatus.CREATED);
+        return "home";
     }
 
 
@@ -84,20 +85,25 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //아이템 찾기
+    //아이템 조회
     @GetMapping("/{itemId}")
-    public ResponseEntity getItem(@PathVariable("itemId") @Positive long itemId){
-
+    public ModelAndView getItem(@PathVariable("itemId") @Positive long itemId) {
         Item item = itemService.findItem(itemId);
-        if(item == null) {
-            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+
+        if (item == null) {
+
+            ModelAndView modelAndView = new ModelAndView("error");
+            modelAndView.addObject("errorMessage", "Item not found");
+            return modelAndView;
         }
 
-        List<Item> itemList = new ArrayList<>();
-        itemList.add(item);
+        List<Item> itemList = Collections.singletonList(item);
         List<OnlyItemResponseDto> itemResponse = mapper.itemToItemResponseDto(itemList);
 
-        return new ResponseEntity<>(itemResponse.get(0), HttpStatus.OK);
+        ModelAndView modelAndView = new ModelAndView("itemView"); // JSP 페이지의 이름
+        modelAndView.addObject("item", itemResponse.get(0));
+
+        return modelAndView;
     }
 
     @GetMapping("/items/search")

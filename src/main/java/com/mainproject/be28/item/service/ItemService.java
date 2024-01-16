@@ -73,13 +73,18 @@ public class ItemService {
     }
 
     public Item findItem(long itemId) {
-        Optional<Item> optionalItem =
-                itemRepository.findById(itemId);
+        Optional<Item> optionalItem = itemRepository.findById(itemId);
         Item item = optionalItem.orElseThrow(() -> new BusinessLogicException(ItemException.ITEM_NOT_FOUND));
-        item.setReviewCount(item.getReviews().size());
+
+        // Reviews가 null이면 빈 리스트로 초기화하여 NullPointerException 방지
+        List<Review> reviews = item.getReviews() != null ? item.getReviews() : Collections.emptyList();
+
+        item.setReviewCount(reviews.size());
         item.setScore(updateScore(item));
+
         return item;
     }
+
 
 
     public void deleteItem(long itemId) {
@@ -88,19 +93,29 @@ public class ItemService {
     }
 
     private Double updateScore(Item item) {
+        if (item == null || item.getReviews() == null) {
+            return 0.0; // 또는 다른 기본값 반환
+        }
+
         if (item.getScore() == null) {
             item.setScore(0.0);
         }
-        List<Review> itemList = item.getReviews();
+
+        List<Review> reviews = item.getReviews();
+
+        if (reviews.isEmpty()) {
+            return item.getScore(); // 리뷰가 없으면 현재 스코어를 반환
+        }
+
         double score = 0D;
-        for (Review review : itemList) {
+        for (Review review : reviews) {
             score += review.getScore();
         }
-        score /= item.getReviews().size();
+
+        score /= reviews.size();
         score = (double) Math.round(score * 100) / 100;
         return score;
     }
-
 
 
     public Page<Item> searchItems(String search, int page, int size, String sort,

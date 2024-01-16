@@ -49,15 +49,16 @@
                 contentType: false,
                 processData: false,
                 success: function () {
-                    window.location.reload();
+                    alert('성공!');
                 },
-                error: function (error) {
-                    alert(JSON.stringify(error));
+                error: function( request, status, error ){
+                    alert("status : " + request.status + ", message : " + request.responseText + ", error : " + error);
                 }
             });
         });
     });
 </script>
+
 
 
 </body>
