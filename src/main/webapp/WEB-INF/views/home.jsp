@@ -15,18 +15,20 @@
 <body>
 <div id="menu">
     <ul>
-        <li id="logo">🛒 TechComputeMall</li>
-        <li><a href="<c:url value='/home'/>">Home</a></li>
-        <li><a href="<c:url value='/board/list'/>">Board</a></li>
+        <li id="logo"><a href="<c:url value='/home'/>">TechComputeMall</a></li>
+        <li><a href="<c:url value='//'/>">문의하기</a></li>
         <li><a href="<c:url value='${loginOutLink}'/>">${loginOut}</a></li>
-        <li><a href="<c:url value='/register/add'/>">Sign in</a></li>
+        <li><a href="<c:url value='/itemUpload'/>">이미지 업로드 하기</a></li>
         <li><a href=""><i class="fa fa-search"></i></a></li>
     </ul>
 </div>
 <div style="text-align:center">
-    <h1>This is HOME</h1>
-    <h1>This is HOME</h1>
-    <h1>This is HOME</h1>
+    <img src="static/images/computer.png" alt="computer1">
+    <c:forEach var="f" items="${flist }">
+        <img src="/img/${f }" style="width:200px;height:200px"><br/>
+    </c:forEach>
+    model.addAttribute("itemId", savedItem.getItemId());
+
 </div>
 </body>
 </html>

@@ -59,7 +59,7 @@ public class Item extends Auditable {
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<ItemImage> itemImage = new ArrayList<>();
+    private List<ItemImage> itemImage ;
 
 
 

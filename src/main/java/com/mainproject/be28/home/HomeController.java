@@ -11,4 +11,9 @@ public class HomeController {
         return "home";
     }
 
+    @GetMapping("/itemUpload")
+    public String itemImageUpload(){
+        return "itemUpload";
+    }
+
 }

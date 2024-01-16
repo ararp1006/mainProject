@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/item")
 @RequiredArgsConstructor
 @Validated
@@ -44,14 +46,24 @@ public class ItemController {
     private final ItemMapper mapper;
     private final int itemListSize = 8;
 
-    //관리자가 개별상품 생성하기
+    // 관리자가 개별 상품 생성하기
     @PostMapping("/admin/items")
-    public ResponseEntity createAdminItem(@RequestBody @Valid ItemDto.Post itemDto){
+    public ResponseEntity createOrUpdateAdminItem(
+            @PathVariable(value = "itemId", required = false) @Positive Long itemId,
+            @RequestPart(value = "file", required = false) List<MultipartFile> files,
+            @RequestPart(value = "itemDto") @Valid ItemDto.Post itemDto
+    ) {
         log.info("--------createItem-------");
         Item item = mapper.itemDtoToItem(itemDto);
-        Item savedItem =itemService.createItem(item);
+        Item savedItem = itemService.createItem(item);
+
+        log.info("------uploadItemsImage------");
+        itemService.uploadImages(itemId, files);
+
+        log.info("------Item Upload------");
         return new ResponseEntity(savedItem.getItemId(), HttpStatus.CREATED);
     }
+
 
     //관리자가 개별상품 수정하기
     @PatchMapping("/admin/items/{itemId}")
@@ -70,15 +82,6 @@ public class ItemController {
         itemService.deleteItem(itemId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-    //관리자가 이미지 업로드
-    @PostMapping("/admin/items/{itemId}/image")
-    public ResponseEntity postItemImage(@ApiParam(value = "File to upload", required = true) @PathVariable("itemId") @Positive Long itemId,
-                                           @RequestPart("file") List<MultipartFile> files
-    ) {
-        log.info("------uploadItemsImage------");
-        itemService.uploadImages(itemId, files);
-        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     //아이템 찾기

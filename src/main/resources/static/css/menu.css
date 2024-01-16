@@ -9,7 +9,7 @@ a { text-decoration: none;  }
 
 ul {
     list-style-type: none;
-    height: 48px;
+    height: 60px;
     width: 100%;
     background-color: #30426E;
     display: flex;
@@ -18,7 +18,7 @@ ul {
 ul > li {
     color: lightgray;
     height : 100%;
-    width:90px;
+    width:150px;
     display:flex;
     align-items: center;
 }
@@ -38,8 +38,8 @@ ul > li > a:hover {
 
 #logo {
     color:white;
+    width:150px;
     font-size: 15px;
-    padding-left:20px;
+    padding-left:10px;
     margin-right:auto;
-    display: flex;
 }
