@@ -1,5 +1,9 @@
 package com.mainproject.be28.item.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.mainproject.be28.config.S3Config;
 import com.mainproject.be28.exception.BusinessLogicException;
 import com.mainproject.be28.exception.ExceptionCode;
 import com.mainproject.be28.item.dto.ItemDto;
@@ -34,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/item")
@@ -46,6 +51,8 @@ public class ItemController {
     private final ItemService itemService;
     private final ItemMapper mapper;
     private final int itemListSize = 8;
+    private final S3Config s3Config;
+
 
     // 관리자가 개별 상품 생성하기
     @PostMapping("/admin/items")
@@ -62,9 +69,27 @@ public class ItemController {
         itemService.uploadImages(savedItem.getItemId(), files);
 
         log.info("------Item Upload------");
-        return "home";
+        return "itemUpload";
     }
 
+    @GetMapping("/itemsPage")
+    public String  itemsPage(Model model) {
+        List<Item> itemList = itemService.getAllItem();
+        List<String> itemNames = itemList.stream().map(Item::getName).collect(Collectors.toList());
+        ObjectMapper objectMapper = new ObjectMapper();
+        String itemsJson;
+        try {
+            itemsJson = objectMapper.writeValueAsString(itemNames);
+        } catch (JsonProcessingException e) {
+            // JSON 변환 중 오류가 발생할 경우 예외 처리
+            itemsJson = "[]"; // 빈 배열로 초기화하거나 다른 예외 처리 방법을 선택할 수 있습니다.
+        }
+        model.addAttribute("items", itemsJson);
+        model.addAttribute("accessKey",s3Config.getAccessKey());
+        model.addAttribute("secretKey",s3Config.getSecretKey());
+
+        return "itemView";
+    }
 
     //관리자가 개별상품 수정하기
     @PatchMapping("/admin/items/{itemId}")
@@ -85,7 +110,7 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //아이템 조회
+    //아이템 상세조회
     @GetMapping("/{itemId}")
     public ModelAndView getItem(@PathVariable("itemId") @Positive long itemId) {
         Item item = itemService.findItem(itemId);

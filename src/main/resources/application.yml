@@ -15,8 +15,8 @@ spring:
 
 cloud:
   aws:
-    credentials.access-key: ${S3_ACCESS_KEY}
-    credentials.secret-key: ${S3_SECRET_KEY}
+    credentials.access-key: AKIA37MIQT43JXABTHHD
+    credentials.secret-key: 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
     s3.bucket: main-test-aream
     region.static: ap-northeast-2
     stack.auto: false

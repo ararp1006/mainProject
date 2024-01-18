@@ -20,7 +20,7 @@ public class ImageInfo {
     @Column(nullable = false)
     private String oriName;
     @Column(nullable = false)
-    private String filePath="C:/Users/박아름/Desktop/mainProject-main/src/main/resources/static/images";
+    private String filePath;
     @Transient
     private final String baseUrl = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com";
 

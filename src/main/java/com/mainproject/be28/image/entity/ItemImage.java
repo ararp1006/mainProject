@@ -30,5 +30,4 @@ public class ItemImage extends Auditable {
     @Setter
     private Item item;
 
-
 }

@@ -1,14 +1,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>상품 등록하기</title>
+    <link rel="stylesheet" href="<c:url value='/css/itemUpload.css'/>">
+
 </head>
 <body>
+<%@ include file="/WEB-INF/views/menu.jsp" %>
+<div style="text-align:center; margin: 30px;">
+<h1>상품을 등록하세요</h1>
+</div>
 <form id="uploadForm" enctype="multipart/form-data">
-
     파일: <input type="file" id="file" name="file" multiple><br/>
     상품명: <input type="text" id="name" required><br/>
     가격: <input type="number" id="price" min="100" required><br/>
@@ -50,6 +55,7 @@
                 processData: false,
                 success: function () {
                     alert('성공!');
+                    window.location.href = '/item/itemsPage';
                 },
                 error: function( request, status, error ){
                     alert("status : " + request.status + ", message : " + request.responseText + ", error : " + error);

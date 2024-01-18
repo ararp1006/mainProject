@@ -27,7 +27,6 @@ public class ImageService {
     private  final FileManager fileManager;
     private final UploadImageS3 uploadImageS3;
     private final ItemImageRepository itemImageRepository;
-
     public ItemImage uploadItemImage(MultipartFile mf, Item item){
         long time = System.currentTimeMillis();
         String originalFilename = mf.getOriginalFilename();

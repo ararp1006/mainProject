@@ -55,4 +55,10 @@ public class ItemDto {
         private OnlyItemResponseDto item;
         private List<ReviewResponseDto> reviews;
         private String imagePath;    }
-}
+    @Getter
+    @AllArgsConstructor
+    public static class ItemAndImageDTO {
+        private String itemName;
+        private String imageKey;
+    }
+    }

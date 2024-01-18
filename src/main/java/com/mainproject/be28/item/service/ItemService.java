@@ -49,6 +49,11 @@ public class ItemService {
     public Item createItem(Item item) {
         return itemRepository.save(item);
     }
+    public List<Item> getAllItem() {
+        return itemRepository.findAll();
+
+    }
+
 
     public Item updateItem(Long itemId, Item itemPatcher){
         Item item = findItem(itemId);
