@@ -50,6 +50,7 @@ public class ItemService {
         return itemRepository.save(item);
     }
     public List<Item> getAllItem() {
+
         return itemRepository.findAll();
 
     }

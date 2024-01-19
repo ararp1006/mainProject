@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,27 +34,34 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.jwtTokenizer = jwtTokenizer;
     }
 
-    // (3) 메서드 내부에서 인증을 시도하는 로직
+    // 메서드 내부에서 인증을 시도하는 로직
     @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
 
-        ObjectMapper objectMapper = new ObjectMapper();    // (3-1)
-        LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class); // (3-2)
+            if (loginDto == null) {
+                // 클라이언트에서 유효한 JSON 데이터가 아닌 경우에 대한 처리
+                throw new AuthenticationServiceException("Invalid JSON data in the request");
+            }
 
-        // (3-3)
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
-        return authenticationManager.authenticate(authenticationToken);  // (3-4)
+            return authenticationManager.authenticate(authenticationToken);
+        } catch (IOException e) {
+            throw new AuthenticationServiceException("Error reading JSON data from the request", e);
+        }
     }
 
     // 클라이언트의 인증 정보를 이용해 인증에 성공할 경우 호출
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        Member member = (Member) authResult.getPrincipal(); // (4-1)
+        Member member = (Member) authResult.getPrincipal();
 
         String accessToken = delegateAccessToken(member);
         String refreshToken = delegateRefreshToken(member);
@@ -70,7 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .onAuthenticationSuccess(request, response, authResult); // 핸들러 불러옴 (실패 핸들러는 자동호출됨)
     }
 
-    // (5)
+
     private String delegateAccessToken(Member member) {
         Map<String, Object> claims = new HashMap<>();
         PrincipalDto principal = PrincipalDto.builder().id(member.getMemberId()).email(member.getEmail())
@@ -92,7 +100,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return accessToken;
     }
 
-    // (6)
+
     private String delegateRefreshToken(Member member) {
         String subject = member.getEmail();
         Date expiration = jwtTokenizer.getTokenExpiration(

@@ -16,4 +16,13 @@ public class HomeController {
         return "itemUpload";
     }
 
+    @GetMapping("/loginForm")
+    public String loginForm(){
+        return "loginForm";
+    }
+
+    @GetMapping("/signIn")
+    public String signin(){
+        return "signIn";
+    }
 }

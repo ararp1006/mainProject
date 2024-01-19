@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.mainproject.be28.member.entity.Member;
@@ -32,7 +34,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @RestController
@@ -48,19 +53,23 @@ public class MemberController {
     private final JwtTokenizer jwtTokenizer;
 
     // 회원 가입
-    @PostMapping("/signup")
-    public ResponseEntity createMEMBER(@RequestBody @Valid MemberDto.PostDto postDto)
+    @PostMapping(value = "/signup")
+    public String createMember( @Valid MemberDto.PostDto postDto, Model model)
             throws MessagingException, UnsupportedEncodingException {
         log.info("##### CREATE MEMBER #####");
 
-        Member member = mapper. memberPostDtoToMember(postDto);
+        Member member = mapper.memberPostDtoToMember(postDto);
         Member savedMember = memberService.createMember(member);
         URI location = UriCreator.createUri(MEMBER_DEFAULT_URL, savedMember.getMemberId());
 
         mailService.sendEmail(savedMember.getEmail(), savedMember.getMailKey(), savedMember.getMemberId());
 
-        return ResponseEntity.created(location).build();
+        // 데이터를 모델에 추가
+        model.addAttribute("savedMember", savedMember);
+
+        return "loginForm";
     }
+
     // Oauth 네이버
     @PostMapping("/oauth/signup/naver")
     public ResponseEntity oAuth2LoginNaver(@RequestBody @Valid AuthLoginDto dto) {

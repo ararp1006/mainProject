@@ -81,8 +81,7 @@ public class ItemController {
         try {
             itemsJson = objectMapper.writeValueAsString(itemNames);
         } catch (JsonProcessingException e) {
-            // JSON 변환 중 오류가 발생할 경우 예외 처리
-            itemsJson = "[]"; // 빈 배열로 초기화하거나 다른 예외 처리 방법을 선택할 수 있습니다.
+            itemsJson = "[]"; // 빈 배열로 초기화
         }
         model.addAttribute("items", itemsJson);
         model.addAttribute("accessKey",s3Config.getAccessKey());
