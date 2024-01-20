@@ -64,7 +64,6 @@
         $.ajax({
             type: "POST",
             url: "/members/signup",
-            contentType: "application/json",
             contentType : 'application/json; charset=utf-8',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader(header, token);

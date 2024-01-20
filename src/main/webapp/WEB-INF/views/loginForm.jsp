@@ -1,9 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page session="false"%>
 <c:set var="loginId" value="${pageContext.request.getSession(false)==null ? '' : pageContext.request.session.getAttribute('id')}"/>
 <c:set var="loginOutLink" value="${loginId=='' ? '/login/login' : '/login/logout'}"/>
 <c:set var="loginOut" value="${loginId=='' ? 'Login' : 'ID='+=loginId}"/>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,13 +25,16 @@
       <i class="fa fa-exclamation-circle"> ${URLDecoder.decode(param.msg)}</i>
     </c:if>
   </div>
-  <input type="text" name="email" value="${cookie.email.value}" placeholder="이메일 입력" autofocus>
-  <input type="password" name="pwd" placeholder="비밀번호">
+  <input type="text" name="email" id="email" value="${cookie.email.value}" placeholder="이메일 입력" autofocus>
+  <input type="password" name="pwd" id="pwd" placeholder="비밀번호">
+
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }" />
   <input type="hidden" name="toURL" value="${param.toURL}">
-  <button>로그인</button>
+
+  <button type="button" onclick="handleSubmit(event)">로그인</button>
   <div>
     <label><input type="checkbox" name="rememberEmail" value="on" ${empty cookie.email.value ? "":"checked"}> 아이디 기억</label> |
-    <a href="">비밀번호 찾기</a> |
+    <a href="">비밀번호 찾기</a>
     <a href="/signIn">회원가입</a>
   </div>
   <script>
@@ -54,28 +58,54 @@
       }
     }
 
-    function submitData() {
-      var postData = {
-        email: $("input[name='email']").val(),
-        password: $("input[name='pwd']").val()
-      };
+    const URL = `${url}/login`;
 
-      $.ajax({
-        type: "POST",
-        url: "/login", // 실제 로그인 엔드포인트로 업데이트
-        contentType: "application/json;",
-        data: JSON.stringify(postData),
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
-        },
-        success: function (response) {
-          console.log("Success:", response);
-        },
-        error: function(error) {
-          alert("status : " + request.status + ", message : " + request.responseText + ", error : " + error);
-        }
-      });
-    }
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const emailElement = document.getElementById('email');
+      const passwordElement = document.getElementById('pwd');
+      const email = emailElement ? emailElement.value : '';
+      const password = passwordElement ? passwordElement.value : '';
+
+      if (email.length && password.length) {
+        const userInfo = {
+          email,
+          password,
+        };
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', URL, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              // Success
+              const res = JSON.parse(xhr.responseText);
+              console.log(res);
+
+              const accessToken = xhr.getResponseHeader('authorization');
+              const memberId = res.memberId;
+
+              console.log(accessToken);
+              localStorage.setItem('access_token', accessToken);
+              localStorage.setItem('memberId', memberId);
+
+              if (typeof setIsLogin === 'function') {
+                setIsLogin(true);
+              }
+              window.location.href = "/home";
+            } else {
+              // Fail
+              console.log(xhr.statusText);
+            }
+          }
+        };
+
+        xhr.send(JSON.stringify(userInfo));
+      }
+    };
+
   </script>
 
 
