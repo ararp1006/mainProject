@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -32,6 +33,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                    JwtTokenizer jwtTokenizer) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenizer = jwtTokenizer;
+
     }
 
     // 메서드 내부에서 인증을 시도하는 로직
@@ -48,14 +50,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new AuthenticationServiceException("Invalid JSON data in the request");
             }
 
+            // UsernamePasswordAuthenticationToken을 생성하고 PrincipalDetails를 설정
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
-            return authenticationManager.authenticate(authenticationToken);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+            // 인증 객체에서 PrincipalDetails를 가져와서 SecurityContextHolder에 설정
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return authentication;
         } catch (IOException e) {
             throw new AuthenticationServiceException("Error reading JSON data from the request", e);
         }
     }
+
 
     // 클라이언트의 인증 정보를 이용해 인증에 성공할 경우 호출
     @Override
@@ -82,11 +91,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String delegateAccessToken(Member member) {
         Map<String, Object> claims = new HashMap<>();
         PrincipalDto principal = PrincipalDto.builder().id(member.getMemberId()).email(member.getEmail())
-                .name(member.getName()).build();
+                .name(member.getName()).roles(String.join(",", member.getRoles())) // 리스트를 쉼표로 구분된 문자열로 결합
+                .build();
         claims.put("username", member.getEmail());
         claims.put("roles", member.getRoles());
         claims.put("principal", principal);
         log.info("###### principal = {} ", principal);
+
 
         String subject = member.getEmail();
         Date expiration = jwtTokenizer.getTokenExpiration(

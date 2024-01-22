@@ -36,10 +36,10 @@ public class MemberAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private void sendUserInfoResponse(HttpServletResponse response, String authorities, String principal) throws IOException {
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);    // (2-3)
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());
 
-        response.getWriter().write(principal);   // (2-5)
+        response.getWriter().write(principal);
     }
 
 

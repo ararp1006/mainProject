@@ -62,4 +62,5 @@ public class MemberDto {
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
     }
+
 }

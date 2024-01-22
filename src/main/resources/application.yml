@@ -11,6 +11,8 @@ spring:
     view:
       prefix: /WEB-INF/views/
       suffix: .jsp
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   thymeleaf:
     cache: false
@@ -41,7 +43,7 @@ test:
         driver-class-name: org.h2.Driver
         username: sa
         password:
-        url: jdbc:h2:mem:test
+        url: jdbc:h2:mem:testdb
         sql:
           init:
             schema-locations: classpath*:db/schema.sql
@@ -61,7 +63,7 @@ test:
           data-locations: classpath*:db/data.sql
 
 jwt:
-  key: yourSecretKey123r345swergsdfg
+  key: yourSecretKey123r345swergsdfg123345345656687678
   access-token-expiration-minutes: 40
   refresh-token-expiration-minutes: 420
 

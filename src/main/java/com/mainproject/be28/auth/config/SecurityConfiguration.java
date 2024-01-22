@@ -3,7 +3,6 @@ package com.mainproject.be28.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mainproject.be28.auth.details.CustomMemberDetailsService;
-import com.mainproject.be28.auth.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.mainproject.be28.auth.filter.JwtAuthenticationFilter;
 import com.mainproject.be28.auth.filter.JwtVerificationFilter;
 import com.mainproject.be28.auth.handler.*;
@@ -12,18 +11,15 @@ import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -53,7 +49,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
             http
-            .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .headers().frameOptions().sameOrigin()
@@ -71,16 +67,12 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers("/h2/**").permitAll()
+                        .anyRequest().permitAll()
                 );
         return http.build();
     }
 
-    @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() {
-        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper, authenticationSuccessHandler, authenticationFailureHandler);
-        jsonUsernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        return jsonUsernamePasswordAuthenticationFilter;
-    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
