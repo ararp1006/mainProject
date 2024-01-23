@@ -18,7 +18,7 @@ ul {
 ul > li {
     color: lightgray;
     height : 100%;
-    width:180px;
+    width: 180px;
     display:flex;
     align-items: center;
 }
@@ -42,4 +42,8 @@ ul > li > a:hover {
     font-size: 15px;
     padding-left:10px;
     margin-right:auto;
+}
+#admin{
+    margin-top: 13px;
+
 }

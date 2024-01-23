@@ -23,6 +23,9 @@
                 <span id="user-name-value"></span>님
             </span>
         </li>
+        <li id="admin" style="display: none;">
+            <a href="/itemUpload">상품등록하기</a>
+        </li>
         <li><a href=""><i class="fa fa-search"></i></a></li>
     </ul>
 </div>
@@ -31,7 +34,7 @@
 
 <script>
 
-    // 페이지 로딩 시 access_token 값을 가져와서 변수에 할당
+    // 페 access_token 값을 가져오기
     const access_token = localStorage.getItem('access_token');
     console.log("access_token= " + access_token);
 
@@ -41,13 +44,20 @@
 
         // 클레임에서 원하는 정보 추출
         const username = decodedToken.name;
+        const role = decodedToken.roles;
         console.log('사용자 이름:', username);
+        console.log('역할',role)
+
 
         // 수정: 사용자 이름이 있을 때만 보이도록 변경
         if (username) {
             document.getElementById('login-text').innerText = '로그아웃';
             document.getElementById('user-name').style.display = 'inline';
             document.getElementById('user-name-value').innerText = username;
+            // 추가: 사용자가 admin일 때만 상품등록하기 메뉴 표시
+            if (role.includes('ADMIN')) {
+                document.getElementById('admin').style.display = 'inline';
+            }
         }
     } else {
         console.log('토큰이 없습니다.');

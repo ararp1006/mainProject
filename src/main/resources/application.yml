@@ -5,8 +5,8 @@ spring:
     user:
       name: admin@gmail.com
       password: 1234
-    basic:
-      enabled: true
+      roles: ROLE_ADMIN
+
   mvc:
     view:
       prefix: /WEB-INF/views/
