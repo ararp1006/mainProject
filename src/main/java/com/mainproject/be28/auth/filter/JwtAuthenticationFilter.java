@@ -93,7 +93,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         PrincipalDto principal = PrincipalDto.builder().id(member.getMemberId()).email(member.getEmail())
                 .name(member.getName()).roles(String.join(",", member.getRoles())) // 리스트를 쉼표로 구분된 문자열로 결합
                 .build();
-        claims.put("username", member.getEmail());
+        claims.put("email", member.getEmail());
+        claims.put("name",member.getName());
         claims.put("roles", member.getRoles());
         claims.put("principal", principal);
         log.info("###### principal = {} ", principal);

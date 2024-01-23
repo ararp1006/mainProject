@@ -27,10 +27,7 @@ public class PrincipalDto implements Principal {
 
     @Override
     public String getName() {
-        return this.email;
-    }
-
-    public String getUserName() {
         return this.name;
     }
-    }
+
+  }
