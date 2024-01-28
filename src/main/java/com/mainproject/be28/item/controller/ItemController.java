@@ -71,19 +71,12 @@ public class ItemController {
         log.info("------Item Upload------");
         return "itemUpload";
     }
-
+//전체 상품 조회
     @GetMapping("/itemsPage")
     public String  itemsPage(Model model) {
         List<Item> itemList = itemService.getAllItem();
-        List<String> itemNames = itemList.stream().map(Item::getName).collect(Collectors.toList());
-        ObjectMapper objectMapper = new ObjectMapper();
-        String itemsJson;
-        try {
-            itemsJson = objectMapper.writeValueAsString(itemNames);
-        } catch (JsonProcessingException e) {
-            itemsJson = "[]"; // 빈 배열로 초기화
-        }
-        model.addAttribute("items", itemsJson);
+
+        model.addAttribute("items",itemList);
         model.addAttribute("accessKey",s3Config.getAccessKey());
         model.addAttribute("secretKey",s3Config.getSecretKey());
 
@@ -124,7 +117,7 @@ public class ItemController {
         List<Item> itemList = Collections.singletonList(item);
         List<OnlyItemResponseDto> itemResponse = mapper.itemToItemResponseDto(itemList);
 
-        ModelAndView modelAndView = new ModelAndView("itemView"); // JSP 페이지의 이름
+        ModelAndView modelAndView = new ModelAndView("itemDetailView"); // JSP 페이지의 이름
         modelAndView.addObject("item", itemResponse.get(0));
 
         return modelAndView;

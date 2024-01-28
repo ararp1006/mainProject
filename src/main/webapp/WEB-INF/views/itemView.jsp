@@ -2,6 +2,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Base64" %>
 <%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.mainproject.be28.item.entity.Item" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -10,23 +13,23 @@
 <%
     String accessKey = (String) request.getAttribute("accessKey");
     String secretKey = (String) request.getAttribute("secretKey");
-    String itemsJson = (String) request.getAttribute("items");
+    String items = (String)request.getAttribute("itemList");
+    System.out.println(items);
 
-    // Encode values
     String encodedAccessKey = Base64.getEncoder().encodeToString(accessKey.getBytes());
     String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-
 
 %>
 <script>
     var accessKey = atob('<%= encodedAccessKey %>');
     var secretKey = atob('<%= encodedSecretKey %>');
-    var items  = <%= itemsJson %>;
 
-    for (var i = 0; i < items.length; i++) {
-        console.log(items[i].name);
-    }
+    var itemsArray = <%=items%>
+    console.log(itemsArray)
+
+
 </script>
+
 
 <%@ include file="/WEB-INF/views/menu.jsp" %>
 <html>

@@ -30,15 +30,16 @@ public class ImageService {
     public ItemImage uploadItemImage(MultipartFile mf, Item item){
         long time = System.currentTimeMillis();
         String originalFilename = mf.getOriginalFilename();
-        String saveFileName = String.format("%d_%s", time, originalFilename.replaceAll(" ", ""));
+        long Id = item.getItemId();
+        String saveFileName = String.format("%d_%s", Id, time, originalFilename.replaceAll(" ", ""));
         String filePath = ImageSort.Item_IMAGE.getPath();
 
-        String savedPath = createAndUploadFile(mf,saveFileName, filePath);
+        String savedPath = createAndUploadFile(mf,saveFileName, filePath,Id);
         log.info("Saved Path : "+savedPath);
 
         ItemImage itemImage = ItemImage.builder()
                 .item(item)
-                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
+                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath, item.getItemId()))
                 .build();
 
         saveImageToDatabase(itemImage);
@@ -52,11 +53,11 @@ public class ImageService {
         String saveFileName = String.format("%d_%s", time, originalFilename.replaceAll(" ", ""));
         String filePath = ImageSort.Member_IMAGE.getPath();
 
-        String savedPath = createAndUploadFile(mf,saveFileName, filePath);
+        String savedPath = createAndUploadFile(mf,saveFileName, filePath, member.getMemberId());
         log.info("Saved Path : "+savedPath);
 
         return MemberImage.builder().member(member)
-                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
+                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath, member.getMemberId()))
                 .build();
     }
     public ReviewImage uploadReviewImage(MultipartFile mf, Review review){
@@ -65,16 +66,16 @@ public class ImageService {
         String saveFileName = String.format("%d_%s", time, originalFilename.replaceAll(" ", ""));
         String filePath = ImageSort.Review_IMAGE.getPath();
 
-        String savedPath = createAndUploadFile(mf,saveFileName, filePath);
+        String savedPath = createAndUploadFile(mf,saveFileName, filePath, review.getReviewId());
         log.info("Saved Path : "+savedPath);
 
         return  ReviewImage.builder().review(review)
-                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath))
+                .imageInfo(new ImageInfo(saveFileName, originalFilename, filePath,review.getReviewId()))
                 .build();
     }
 
     // 임시 파일 생성 & 업데이트 & 임시 파일 삭제
-    private  String createAndUploadFile(MultipartFile mf, String saveFileName, String filePath) {
+    private  String createAndUploadFile(MultipartFile mf, String saveFileName, String filePath, Long Id) {
         // 파일 생성
         File uploadFile = null;
         try {

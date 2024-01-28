@@ -9,7 +9,7 @@
 
 </head>
 <body>
-<%@ include file="/WEB-INF/views/menu.jsp" %>
+<%@ include file="/WEB-INF/views/admin_menu.jsp" %>
 <div style="text-align:center; margin: 30px;">
 <h1>상품을 등록하세요</h1>
 </div>

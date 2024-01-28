@@ -15,6 +15,16 @@
     <ul>
         <li id="logo"><a href="<c:url value='/home'/>">TechComputeMall</a></li>
         <li><a href="<c:url value='/item/itemsPage'/>">상품보러가기</a></li>
+
+        <li id="item">
+            <a href="/itemUpload">상품관리하기</a>
+        </li>
+        <li id="Review">
+            <a href="/Review">리뷰관리하기</a>
+        </li>
+        <li id="member">
+            <a href="/member">멤버관리</a>
+        </li>
         <li id="login-logout">
             <a href="/loginForm" onclick="toggleLoginStatus()">
                 <span id="login-text"></span>
@@ -22,9 +32,6 @@
             <span id="user-name" style="display: none;" >
                 <span id="user-name-value"></span>님
             </span>
-        </li>
-        <li id="admin" style="display: none;">
-            <a href="/itemUpload">관리자페이지</a>
         </li>
         <li><a href=""><i class="fa fa-search"></i></a></li>
     </ul>
@@ -34,7 +41,7 @@
 
 <script>
 
-    // access_token 값을 가져오기
+    // 페 access_token 값을 가져오기
     const access_token = localStorage.getItem('access_token');
     console.log("access_token= " + access_token);
 

@@ -21,6 +21,8 @@ public class ImageInfo {
     private String oriName;
     @Column(nullable = false)
     private String filePath;
+    @Column(nullable = false)
+    private Long Id;
     @Transient
     private final String baseUrl = "http://main-test-aream.s3-website.ap-northeast-2.amazonaws.com";
 
