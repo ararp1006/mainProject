@@ -11,6 +11,7 @@ import com.mainproject.be28.auth.utils.CustomAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -48,9 +49,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .headers().frameOptions().sameOrigin()
@@ -70,15 +70,12 @@ public class SecurityConfiguration {
                         .antMatchers("/h2/**").permitAll()
                         .anyRequest().permitAll()
                 );
+
+
         return http.build();
     }
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user").password("{noop}user123").roles("USER")
-                .and()
-                .withUser("admin").password("{noop}admin123").roles("ADMIN")
-        ;
-    }
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

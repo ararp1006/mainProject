@@ -95,6 +95,8 @@ dependencies {
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // jsp 사용시 필수 요소
     implementation 'org.springframework.security:spring-security-taglibs:5.5.0' //
 
+//myBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
 
 }
 allprojects {

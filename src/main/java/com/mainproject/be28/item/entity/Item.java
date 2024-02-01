@@ -49,7 +49,7 @@ public class Item extends Auditable {
     private long reviewCount;
 
     @Column(length = 100)
-    private Integer stock;
+    private int stock;
 
     @Column(nullable = false)
     @Builder.Default

@@ -10,6 +10,7 @@ import com.mainproject.be28.image.service.ImageService;
 import com.mainproject.be28.member.data.MemberStatus;
 import com.mainproject.be28.member.entity.Member;
 import com.mainproject.be28.member.excption.MemberException;
+import com.mainproject.be28.member.mapper.MemberMapper;
 import com.mainproject.be28.member.repository.MemberRepository;
 import com.mainproject.be28.cart.entity.Cart;
 import java.io.UnsupportedEncodingException;
@@ -46,7 +47,6 @@ public class MemberService {
     private final ApplicationEventPublisher publisher;
     private final ImageService imageService;
     private final JwtTokenizer jwtTokenizer;
-
     public  MemberService(CustomAuthorityUtils authorityUtils, PasswordEncoder passwordEncoder,
                           MemberRepository memberRepository,
                        ApplicationEventPublisher publisher, ImageService imageService, JwtTokenizer jwtTokenizer) {
@@ -59,8 +59,6 @@ public class MemberService {
     }
 
     public Member createMember(Member member) throws MessagingException, UnsupportedEncodingException {
-        log.info("member = {}", member);
-        verifyExistsEmail(member.getEmail());
 
         setDefaultMemberInfo(member);
 
@@ -231,6 +229,7 @@ public class MemberService {
         }
     }
 
+    //이메일 중복체크
     public Boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
@@ -303,4 +302,6 @@ public class MemberService {
         return memberRepository.findAll(PageRequest.of(page, size,
                 Sort.by("memberId").descending()));
     }
+
+
 }

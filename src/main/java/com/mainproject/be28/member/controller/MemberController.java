@@ -14,21 +14,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.mainproject.be28.member.entity.Member;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -39,6 +41,7 @@ import org.springframework.data.domain.Page;
 @Validated
 @Slf4j
 @RequiredArgsConstructor
+
 public class MemberController {
     private final static String MEMBER_DEFAULT_URL = "/members";
     private final MemberService memberService;
@@ -48,7 +51,7 @@ public class MemberController {
 
     // 회원 가입
     @PostMapping(value = "/signup")
-    public String createMember( @Valid MemberDto.PostDto postDto, Model model)
+    public ResponseEntity<String> submitSignUp(@Valid @RequestBody MemberDto.PostDto postDto)
             throws MessagingException, UnsupportedEncodingException {
         log.info("##### CREATE MEMBER #####");
 
@@ -58,10 +61,7 @@ public class MemberController {
 
         mailService.sendEmail(savedMember.getEmail(), savedMember.getMailKey(), savedMember.getMemberId());
 
-        // 데이터를 모델에 추가
-        model.addAttribute("savedMember", savedMember);
-
-        return "redirect:/loginForm";
+        return ResponseEntity.ok().body("\"이메일 인증을 해주세요!\"");
     }
 
     // Oauth 네이버
@@ -122,6 +122,12 @@ public class MemberController {
                 .header("Refresh", refreshToken).build();
     }
 
+    //이메일 중복체크
+    @GetMapping("/checkEmail/{email}")
+    public ResponseEntity<Boolean> checkEmail(@PathVariable String email) {
+        return  ResponseEntity.ok(memberService. existsByEmail(email));
+
+    }
     //회원 삭제
     @DeleteMapping
     public ResponseEntity deleteUser(
@@ -179,16 +185,7 @@ public class MemberController {
 
         return ResponseEntity.ok().build();
     }
-    //로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity logout(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        String jws = authorizationHeader.substring(7);    // "Bearer " 이후의 토큰 문자열 추출
 
-        jwtTokenizer.addToTokenBlackList(jws);     //블랙리스트에 jws 추가, 접근 막음
-
-        return ResponseEntity.ok().body("Successfully logged out");
-    }
     //이미지 업로드
     @PostMapping("/image")
     public ResponseEntity postUserImage(Principal principal,

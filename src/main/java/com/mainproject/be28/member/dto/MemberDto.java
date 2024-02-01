@@ -31,10 +31,10 @@ public class MemberDto {
         @Size(min = 2, max = 10)
         private String name;
 
-
     }
     @Data
     @Getter
+    @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PatchDto {
@@ -48,6 +48,8 @@ public class MemberDto {
     }
 
     @Data
+    @Getter
+    @Setter
     @AllArgsConstructor
     public static class ResponseDto {
 
