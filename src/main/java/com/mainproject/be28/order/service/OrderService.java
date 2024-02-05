@@ -180,6 +180,11 @@ public class OrderService {
         return order.getOrderId();
     }
 
+  /*  public Point chargePoint(PointChargeDto dto, int id){
+        Member member = memberRepository.findMemberById(id);
+        dto.setMember(member);
+        return pointRepository.save(mapper.map(dto,Point.class))
+    }*/
 
 
 

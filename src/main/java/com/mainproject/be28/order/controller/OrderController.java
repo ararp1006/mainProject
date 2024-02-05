@@ -8,6 +8,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import com.mainproject.be28.auth.details.PrincipalDetails;
 import com.mainproject.be28.auth.utils.UriCreator;
+import com.mainproject.be28.member.service.MemberService;
 import com.mainproject.be28.order.dto.OrderPageResponseDto;
 import com.mainproject.be28.order.dto.OrderPostDto;
 import com.mainproject.be28.order.dto.OrderResponseDto;
@@ -32,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OrderController {
     private final OrderService orderService;
     private final OrderMapper mapper;
+
 
     @PostMapping
     public ResponseEntity<?> createOrderAndProceedToPayment(
@@ -75,7 +77,12 @@ public class OrderController {
         orderService.cancelOrder(orderNumber);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+   /* @GetMapping("/member/mypage/charge/point")//현재 사용자의 주문 내역을 조회
+    public @ResponseBody  void chargePoint(Long amount) {
+        int id = orderService.getIdFromAuth();
+        orderService.chargePont(new ChargeDto(amount),id);
 
+    }*/
 
 }
 

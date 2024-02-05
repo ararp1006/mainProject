@@ -46,13 +46,8 @@ public class HomeController {
     public String adminPage() {
         return "adminPage";
     }
-    @GetMapping( "/sample")
-    public String sample(Principal principal, Model model){
-        log.info("principal"+principal);
+    @GetMapping( "/order")
+    public String Order(){return "iamPort";
 
-            model.addAttribute("member", principal);
-
-
-        return "sample";
     }
 }
