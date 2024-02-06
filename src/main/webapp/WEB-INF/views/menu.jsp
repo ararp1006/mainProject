@@ -20,7 +20,8 @@
                 <span id="login-text"></span>
             </a>
             <span id="user-name" style="display: none;" >
-                <span id="user-name-value"></span>님
+                <span id="user-name-value">
+                </span>님
             </span>
         </li>
         <li id="admin" style="display: none;">
@@ -33,7 +34,6 @@
 
 
 <script>
-
     // access_token 값을 가져오기
     const access_token = localStorage.getItem('access_token');
     console.log("access_token= " + access_token);
@@ -45,6 +45,8 @@
         // 클레임에서 원하는 정보 추출
         const username = decodedToken.name;
         const role = decodedToken.roles;
+        const email = decodedToken.email;
+
         console.log('사용자 이름:', username);
         console.log('역할',role)
 
@@ -54,6 +56,9 @@
             document.getElementById('login-text').innerText = '로그아웃';
             document.getElementById('user-name').style.display = 'inline';
             document.getElementById('user-name-value').innerText = username;
+            document.getElementById('user-name-value').addEventListener('click', function() {
+                window.location.href = '/myPage';
+            });
             // 추가: 사용자가 admin일 때만 상품등록하기 메뉴 표시
             if (role.includes('ADMIN')) {
                 document.getElementById('admin').style.display = 'inline';

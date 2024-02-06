@@ -45,6 +45,7 @@ public class MemberDto {
         private String phoneNumber;
         private Address address;
         private DeliveryInformation deliveryInformation;
+        private String imagePath;
     }
 
     @Data

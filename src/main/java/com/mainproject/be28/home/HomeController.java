@@ -47,7 +47,13 @@ public class HomeController {
         return "adminPage";
     }
     @GetMapping( "/order")
-    public String Order(){return "iamPort";
+    public String Order(){return "iamPort";}
+    @GetMapping( "/myPage")
+    public String myPage(){return "myPage";
+
+    }
+    @GetMapping( "/updateMemberForm")
+    public String updateMemberForm(){return "updateMemberForm";
 
     }
 }

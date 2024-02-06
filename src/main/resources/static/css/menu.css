@@ -47,3 +47,13 @@ ul > li > a:hover {
     margin-top: 13px;
 
 }
+#user-name-value {
+    cursor: pointer;
+    color :white;
+    border-bottom: 3px solid rgb(209, 209, 209);
+
+}
+#user-name-value:hover {
+    color :white;
+    border-bottom: 3px solid rgb(209, 209, 209);
+}

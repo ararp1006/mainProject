@@ -157,11 +157,9 @@ public class MemberController {
 
     //회원 상세 정보 조회
     @GetMapping
-    public ResponseEntity getUser(Principal principal) {
+    public String getUser(Principal principal, Model model) {
         log.info("##### GET USER #####");
         log.debug("principal: {}", principal);
-
-
         Member findMember = memberService.checkMemberExist(principal.getName());
         MemberDto.ResponseDto memberResponseDto = mapper.memberToMemberResponseDto(findMember);
 
@@ -171,7 +169,8 @@ public class MemberController {
                     imageInfo.getBaseUrl() + imageInfo.getFilePath() + imageInfo.getImageName());
 
         }
-        return ResponseEntity.ok(memberResponseDto);
+        model.addAttribute("memberResponseDto", memberResponseDto);
+        return "myPage";
     }
     // 비밀번호 변경
     @PatchMapping("/password")
