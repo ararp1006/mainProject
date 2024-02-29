@@ -46,14 +46,22 @@ public class HomeController {
     public String adminPage() {
         return "adminPage";
     }
-    @GetMapping( "/order")
-    public String Order(){return "iamPort";}
+    @GetMapping( "/iamPort")
+    public String iamPort(){return "iamPort";}
     @GetMapping( "/myPage")
     public String myPage(){return "myPage";
 
     }
     @GetMapping( "/updateMemberForm")
     public String updateMemberForm(){return "updateMemberForm";
+
+    }
+    @GetMapping( "/cart")
+    public String cart(){return "cart";
+
+    }
+    @GetMapping( "/order")
+    public String order(){return "order";
 
     }
 }

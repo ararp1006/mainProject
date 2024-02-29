@@ -23,6 +23,7 @@
                 <span id="user-name-value">
                 </span>님
             </span>
+
         </li>
         <li id="admin" style="display: none;">
             <a href="/itemUpload">관리자페이지</a>
