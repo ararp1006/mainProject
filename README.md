@@ -97,6 +97,20 @@
 - [OAuth2](https://ararp1006.github.io/posts/OAuth2/)
 
 
+<hr>-----------------------------------------------
 
+## <span style = 'background-color: #E6E6FA'>**[프로젝트 진행중 궁금증 및 에러에 대한 포스팅]**</span>
+
+- [프로젝트 구조인 계층형 아키텍쳐란??](https://ararp1006.github.io/posts/%EA%B3%84%EC%B8%B5%ED%98%95-%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90/)
+
+- [Spring Security 동작원리??](https://ararp1006.github.io/posts/Spring-Security/)
+
+- [JWT vs Session](https://ararp1006.github.io/posts/Session/)
+
+- [Auditable 오류해결](https://ararp1006.github.io/posts/Auditable-%EC%98%A4%EB%A5%98-%ED%95%B4%EA%B2%B0/)
+
+- [스택 오버플로우 오류해결](https://ararp1006.github.io/posts/%EC%8A%A4%ED%83%9D%EC%98%A4%EB%B2%84%ED%94%8C%EB%A1%9C%EC%9A%B0-%EC%98%A4%EB%A5%98%ED%95%B4%EA%B2%B0/)
+
+- [415에러 해결](https://ararp1006.github.io/posts/415%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/)
 
 
