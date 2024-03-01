@@ -16,10 +16,24 @@
 
 <br />
 
-### 2) 상세설명
+## <span style = 'background-color: #E6E6FA'>**[프로젝트 설명]**</span>
+
+ 🛒 TechComputeMall   [프로젝트 깃헙 바로가기](https://github.com/ararp1006/mainProject)
+
+ 이 프로젝트의 주제를 정하게 된 이유는 다양한 종류의 모니터, 키보드, 마우스 등과 같은 주변기기들을 
+
+ 한 플랫폼에서 편리하게 비교하고 구매할 수 있는 온라인 쇼핑 경험을 고객들에게 제공하고자 했습니다.  
+
+
+<hr>-----------------------------------------------
+
+
+## <span style = 'background-color: #E6E6FA'>**[프로젝트 구조]**</span>
+
 아키텍쳐는 layerd Pattern을 사용했습니다. 
 
 모듈별로 업무를 나눠서 협업하기 용이했습니다.
+
 
 > ![image](https://github.com/ararp1006/Algorithm/assets/130068083/dc931afb-2da3-4719-ae7a-cd7152153624)
 
@@ -32,11 +46,47 @@
 > ![image](https://github.com/ararp1006/mainProject/assets/130068083/1725fd5b-b5d6-431e-b0b0-553d73062686)
 
 
+<hr>-----------------------------------------------
+
+## <span style = 'background-color: #E6E6FA'>**[JSP]**</span>
+>홈
+
+![image](https://github.com/ararp1006/Algorithm/assets/130068083/7718570e-b3ae-4c31-91af-7ad64a47235c)
+
+![image](https://github.com/ararp1006/Algorithm/assets/130068083/67813d34-9375-4bb5-906b-47fd78cbe1f2)
+
+>마이페이지
+
+![image](https://github.com/ararp1006/mainProject/assets/130068083/6644e8d6-62f6-40d2-84ee-11df0be3018c)
+
+![image](https://github.com/ararp1006/mainProject/assets/130068083/6e5b1f67-4359-4b47-b874-c99af538c43d)
+
+![image](https://github.com/ararp1006/mainProject/assets/130068083/79cc616f-0405-48e2-b4f5-211d5ba20af3)
+
+>결제
+
+![image](https://github.com/ararp1006/mainProject/assets/130068083/cf049f81-ed79-4265-a007-0a07d7bb5697)
+
+
+
+### <span style = 'background-color: #E6E6FA'>**[관리자페이지]**</span>
+> 로그인했을 때 관리자페이지가 보임
+
+>![20240124_025500](https://github.com/ararp1006/Algorithm/assets/130068083/89b034ca-acde-4470-bca7-5ca4f4ee1878)
+
+>![image](https://github.com/ararp1006/Algorithm/assets/130068083/09ae4f18-fcc3-4f20-ad0a-d89658a54ca0)
+
+>![image](https://github.com/ararp1006/Algorithm/assets/130068083/a11f6637-0cb3-44cf-8ccc-b789deeec43d)
 
 
 ## <span style = 'background-color: #E6E6FA'>**[📜개인 기능 설명]**</span>
+- [Home&메뉴](https://ararp1006.github.io/posts/HOME/)
+
+- [회원가입](https://ararp1006.github.io/posts/HOME/)
 
 - [이메일 인증](https://ararp1006.github.io/posts/%EC%9D%B4%EB%A9%94%EC%9D%BC%EC%9D%B8%EC%A6%9D/)
+
+- [이메일 중복체크](https://ararp1006.github.io/posts/%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%A4%91%EB%B3%B5%EC%B2%B4%ED%81%AC/)
 
 - [AWS서버구축](https://ararp1006.github.io/posts/cloud/)
 
@@ -44,83 +94,9 @@
 
 - [이미지 업로드](https://ararp1006.github.io/posts/%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%97%85%EB%A1%9C%EB%93%9C/)
 
-
-<details>
-<summary>리뷰 API</summary>
-<div markdown="1"> 
-
-- 리뷰등록
-
-- 리뷰 수정
-
-- 리뷰 삭제
-
-- 리뷰 이미지 등록
-
-- 평점 추가
-
-- 평점 삭제
-</div>
-</details>
-
-
-<details>
-<summary> 문의사항 API</summary>
-<div markdown="1">
-
-- 문의사항 등록
-
-- 문의사항 상세조회
-
-- 문의사항 삭제
-
-- 문의사항 수정
-
-- 문의사항 리스트 조회
-
-</div>
-</details>
-
-<details>
-<summary> 주문 API</summary>
-<div markdown="1">
-
-- 상품에서 바로 주문
-
-- 결제 확인
-
-- 사용자의 주문내역
-
-- 주문취소
-
-</div>
-</details>
-
-<details>
-<summary> oauth2 </summary>
-<div markdown="1">
-
-- 구글
-
-- 네이버
-
-- 카카오
-
-</div>
-</details> 
+- [OAuth2](https://ararp1006.github.io/posts/OAuth2/)
 
 
 
-## <span style = 'background-color: #E6E6FA'>**[프로젝트 진행중 궁금증 및 에러에 대한 포스팅]**</span>
-
-- [프로젝트 구조인 계층형 아키텍쳐란??](https://ararp1006.github.io/posts/%EA%B3%84%EC%B8%B5%ED%98%95-%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90/)
-
-- [Spring Security 동작원리??](https://ararp1006.github.io/posts/Spring-Security/)
-
-- [JWT vs Session](https://ararp1006.github.io/posts/Session/)
-
-- [Auditable 오류해결](https://ararp1006.github.io/posts/Auditable-%EC%98%A4%EB%A5%98%ED%95%B4%EA%B2%B0/)
-
-- [스택 오버플로우 오류해결](https://ararp1006.github.io/posts/%EC%8A%A4%ED%83%9D%EC%98%A4%EB%B2%84%ED%94%8C%EB%A1%9C%EC%9A%B0-%EC%98%A4%EB%A5%98%ED%95%B4%EA%B2%B0/)
 
 
