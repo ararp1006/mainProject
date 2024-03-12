@@ -14,13 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class HomeController {
-    private final MemberService memberService;
 
     @GetMapping("/home")
     public String home() {
@@ -62,6 +62,10 @@ public class HomeController {
     }
     @GetMapping( "/order")
     public String order(){return "order";
+
+    }
+    @GetMapping( "/api/kinderInfo")
+    public String childSchool(){return "childSchool";
 
     }
 }

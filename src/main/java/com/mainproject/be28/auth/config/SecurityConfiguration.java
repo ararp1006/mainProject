@@ -85,7 +85,7 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.applyPermitDefaultValues();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:3000", "https://e-childschoolinfo.moe.go.kr/api/notice/basicInfo2.do?key=ff68beb6b3c94d71bdacf19210691653&sidoCode=11&sggCode=11320"));
         configuration.setAllowedMethods(Arrays.asList("GET", "PATCH", "DELETE", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Refresh"));
