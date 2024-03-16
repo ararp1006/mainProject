@@ -88,7 +88,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 //mail
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // Spring으로 465포트를 통해 메일을 보내주는 역할
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation 'org.springframework.boot:spring-boot-devtools'
 
@@ -102,6 +102,13 @@ dependencies {
 
 //myBatis
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.data:spring-data-redis:2.7.5' // Redis와 Spring을 통신할 수 있게 해준다.
+    implementation 'io.lettuce:lettuce-core:6.2.1.RELEASE' // thread-safe한 Redis 클라이언트다
+    implementation 'ognl:ognl:3.2.14'
+
 
 }
 allprojects {

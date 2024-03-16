@@ -6,6 +6,9 @@ spring:
       name: admin@gmail.com
       password: 1234
       roles: ROLE_ADMIN
+  redis:
+    host: localhost
+    port: 6379
 
   mvc:
     view:
@@ -22,8 +25,8 @@ spring:
 
 cloud:
   aws:
-    credentials.access-key: AKIA37MIQT43JXABTHHD
-    credentials.secret-key: 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
+    credentials.access-key:
+    credentials.secret-key:
     s3.bucket: main-test-aream
     region.static: ap-northeast-2
     stack.auto: false
