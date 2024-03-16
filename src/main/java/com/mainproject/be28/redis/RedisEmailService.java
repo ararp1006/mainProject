@@ -11,6 +11,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Random;
@@ -27,10 +29,26 @@ public class RedisEmailService {
     private final RedisUtil redisUtil;
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-
-    private static final long MAX_EMAILS_PER_HOUR = 1;
+    private static final String EMAIL_QUEUE_KEY = "email_queue";
+    private static final long MAX_EMAILS_PER_HOUR = 5;
     private static final long EXPIRATION_TIME_SECONDS = 3600; // 1시간
-
+    @PostConstruct
+    public void initializeEmailWorker() {
+        // 이메일을 백그라운드에서 처리할 작업자를 시작
+        Thread emailWorker = new Thread(() -> {
+            while (true) {
+                try {
+                    String email = redisTemplate.opsForList().leftPop(EMAIL_QUEUE_KEY, 10, TimeUnit.SECONDS);
+                    if (email != null) {
+                        sendEmail(email);
+                    }
+                } catch (MessagingException e) {
+                    log.error("Error processing email: {}", e.getMessage());
+                }
+            }
+        });
+        emailWorker.start();
+    }
     public boolean canSendEmail(String userEmail) {
         String key = "email_limit:" + userEmail;
         Long emailCount = redisTemplate.opsForValue().increment(key, 1); // 이메일 카운트 증가
@@ -87,5 +105,8 @@ public class RedisEmailService {
 
         mailSender.send(emailForm);
     }
-
+    // 이메일을 메시지 큐에 추가
+    public void queueEmail(String toEmail) {
+        redisTemplate.opsForList().rightPush(EMAIL_QUEUE_KEY, toEmail);
+    }
 }
