@@ -11,11 +11,9 @@ plugins {
     id 'war' // jsp 사용시 필수 요소
 
 }
-war {
-    enabled = false
-}
+
 jar{
-    enabled = true
+    enabled = false
 }
 group = 'com.mainproject'
 version = '0.0.1-SNAPSHOT'

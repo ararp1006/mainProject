@@ -1,11 +1,6 @@
 
-FROM openjdk:11
+FROM tomcat:latest
 
+COPY main-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/app.war
 
-ARG JAR_FILE=build/libs/*-b./
-
-
-COPY ${JAR_FILE} app.jar
-
-
-ENTRYPOINT ["java","-jar","/app.jar"]
+CMD ["catalina.sh", "run"]
