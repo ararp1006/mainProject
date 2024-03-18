@@ -28,6 +28,7 @@ public class Cart extends Auditable  {
     @JoinColumn(name = "member_Id")
     private Member member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems = new ArrayList<>();
 

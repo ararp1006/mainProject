@@ -42,13 +42,13 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     //QueryDsl
-    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}" // queryDSL
-    implementation "com.querydsl:querydsl-apt:${queryDslVersion}" // queryDSL
-
+    //querydsl 추가
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 
     // Logback 의존성 추가
-    implementation 'ch.qos.logback:logback-classic:1.2.6'
+    annotationProcessor 'org.projectlombok:lombok'
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'commons-fileupload:commons-fileupload:1.5'
@@ -126,23 +126,29 @@ tasks.named('test') {
 //querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
 
-querydsl {
+querydsl {// queryDSL
     jpa = true
     querydslSourcesDir = querydslDir
 }
-sourceSets {
+sourceSets { // queryDSL
     main.java.srcDir querydslDir
 }
-compileQuerydsl{
-    options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
+
+configurations { // queryDSL
     compileOnly {
         extendsFrom annotationProcessor
     }
     querydsl.extendsFrom compileClasspath
 }
-//querydsl 추가 끝
+compileQuerydsl { // queryDSL
+    options.annotationProcessorPath = configurations.querydsl
+}
+tasks.named('test') {
+    useJUnitPlatform()
+}
+clean {
+    delete file('src/main/generated')
+}
 jar {
     manifest {
         attributes 'Main-Class': 'com.mainproject.be28.Be28Application'

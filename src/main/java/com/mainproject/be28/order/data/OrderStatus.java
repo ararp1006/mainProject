@@ -1,8 +1,9 @@
 package com.mainproject.be28.order.data;
 
 import java.util.Arrays;
-import lombok.Getter;
 
+import lombok.Builder;
+import lombok.Getter;
 public enum OrderStatus {
     NOT_PAID(0, "미결제"),
     ORDER_COMPLETED(1, "주문완료"),

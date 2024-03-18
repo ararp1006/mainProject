@@ -34,6 +34,7 @@ public class Order extends Auditable {
 
     private Long totalPrice; // 주문 총액
 
+    @Builder.Default
     private OrderStatus status = OrderStatus.NOT_PAID; // 주문 상태
 
     private String addressee; // 받는 사람
@@ -50,6 +51,7 @@ public class Order extends Auditable {
     @JoinColumn(name = "Member_ID")
     private Member member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 

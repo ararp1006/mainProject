@@ -2,7 +2,7 @@
 FROM openjdk:11
 
 
-ARG JAR_FILE=build/libs/*-SNAPSHOT.jar
+ARG JAR_FILE=build/libs/*-b./
 
 
 COPY ${JAR_FILE} app.jar
